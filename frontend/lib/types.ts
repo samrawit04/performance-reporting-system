@@ -120,6 +120,27 @@ export interface BSCPerspectiveScore {
   rating: string;
 }
 
+/** AI Analysis Model */
+export interface AiAnalysis {
+  id: string;
+  submission_id: string;
+  executive_summary: string;
+  strengths: string[];
+  improvement_areas: string[];
+  perspective_analysis: {
+    FINANCIAL?: string;
+    CUSTOMER?: string;
+    INTERNAL_PROCESS?: string;
+    LEARNING_GROWTH?: string;
+  };
+  recommendations: string[];
+  model_used: string;
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  created_at: string;
+  updated_at: string;
+}
+
 /** Performance Submission */
 export interface PerformanceSubmission {
   id: string;
@@ -137,6 +158,7 @@ export interface PerformanceSubmission {
   source_file_id?: string;
   entries: PerformanceEntry[];
   perspective_scores: BSCPerspectiveScore[];
+  ai_analysis?: AiAnalysis;
   created_at: string;
   updated_at: string;
 }

@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { api } from '../../../../lib/api';
 import {
   PerformanceSubmission,
-  BscPerspective,
+  AiAnalysis,
   SubmissionStatus,
 } from '../../../../lib/types';
 import { Badge } from '../../../../components/ui/Badge';
 import { Button } from '../../../../components/ui/Button';
+import { Modal } from '../../../../components/ui/Modal';
 
 export default function SubmissionDetailPage({
   params,
@@ -20,15 +21,34 @@ export default function SubmissionDetailPage({
   const [submission, setSubmission] = useState<PerformanceSubmission | null>(
     null,
   );
+  const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
+  const [activeTab, setActiveTab] = useState<'kpi' | 'ai'>('kpi');
   const [isLoading, setIsLoading] = useState(true);
   const [isRecalculating, setIsRecalculating] = useState(false);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Edit AI modal state
+  const [isEditAiOpen, setIsEditAiOpen] = useState(false);
+  const [editSummary, setEditSummary] = useState('');
+  const [isSavingAi, setIsSavingAi] = useState(false);
 
   const fetchDetail = async () => {
     try {
       setIsLoading(true);
       const data = await api.get<PerformanceSubmission>(`/submissions/${id}`);
       setSubmission(data);
+
+      // Fetch AI analysis if available
+      try {
+        const aiData = await api.get<AiAnalysis>(`/submissions/${id}/ai-analysis`);
+        if (aiData && aiData.id) {
+          setAiAnalysis(aiData);
+          setEditSummary(aiData.executive_summary || '');
+        }
+      } catch {
+        // AI analysis not yet generated
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load submission details');
     } finally {
@@ -49,6 +69,50 @@ export default function SubmissionDetailPage({
       alert(err.message || 'Failed to recalculate submission');
     } finally {
       setIsRecalculating(false);
+    }
+  };
+
+  const handleGenerateAi = async () => {
+    setIsGeneratingAi(true);
+    try {
+      const generated = await api.post<AiAnalysis>(
+        `/submissions/${id}/generate-ai-analysis`,
+      );
+      setAiAnalysis(generated);
+      setEditSummary(generated.executive_summary || '');
+      setActiveTab('ai');
+      // Update submission status in view
+      if (submission) {
+        setSubmission({
+          ...submission,
+          status: 'AI_ANALYZED',
+        });
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to generate AI analysis');
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
+
+  const handleSaveEditedAi = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aiAnalysis) return;
+
+    setIsSavingAi(true);
+    try {
+      const updated = await api.patch<AiAnalysis>(
+        `/submissions/${id}/ai-analysis`,
+        {
+          executive_summary: editSummary,
+        },
+      );
+      setAiAnalysis(updated);
+      setIsEditAiOpen(false);
+    } catch (err: any) {
+      alert(err.message || 'Failed to save edits');
+    } finally {
+      setIsSavingAi(false);
     }
   };
 
@@ -114,7 +178,7 @@ export default function SubmissionDetailPage({
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-16">
-      {/* Top Breadcrumb & Actions */}
+      {/* Top Breadcrumb & Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
@@ -138,10 +202,19 @@ export default function SubmissionDetailPage({
           >
             🔄 Recalculate Scores
           </Button>
+
+          <Button
+            size="sm"
+            onClick={handleGenerateAi}
+            isLoading={isGeneratingAi}
+            className="shadow-sm"
+          >
+            🤖 {aiAnalysis ? 'Regenerate AI Analysis' : 'Generate AI Analysis'}
+          </Button>
         </div>
       </div>
 
-      {/* Executive Summary Highlight Card */}
+      {/* Executive Summary Highlight Banner */}
       <div className="rounded-3xl bg-[var(--card)] border border-[var(--border)] p-8 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2.5">
@@ -174,7 +247,7 @@ export default function SubmissionDetailPage({
           </div>
         </div>
 
-        {/* Overall Score Badge */}
+        {/* Overall Score Highlight Box */}
         <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/40 border border-indigo-100 dark:border-indigo-900/60 text-center min-w-44 shrink-0 shadow-inner">
           <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Overall Score
@@ -191,133 +264,347 @@ export default function SubmissionDetailPage({
         </div>
       </div>
 
-      {/* 4 Balanced Scorecard Perspective Summary Cards */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--muted)]">
-          Balanced Scorecard Perspectives Performance
-        </h2>
+      {/* Tabs */}
+      <div className="flex border-b border-[var(--border)] gap-2">
+        <button
+          onClick={() => setActiveTab('kpi')}
+          className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 cursor-pointer ${
+            activeTab === 'kpi'
+              ? 'border-[var(--primary)] text-[var(--primary)]'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
+          }`}
+        >
+          📊 Balanced Scorecard & KPIs
+        </button>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            {
-              key: 'FINANCIAL',
-              name: '1. Financial',
-              theme: 'purple',
-            },
-            {
-              key: 'CUSTOMER',
-              name: '2. Customer',
-              theme: 'cyan',
-            },
-            {
-              key: 'INTERNAL_PROCESS',
-              name: '3. Internal Process',
-              theme: 'amber',
-            },
-            {
-              key: 'LEARNING_GROWTH',
-              name: '4. Learning & Growth',
-              theme: 'emerald',
-            },
-          ].map((item) => {
-            const bsc = submission.perspective_scores?.find(
-              (p) => p.perspective === item.key,
-            );
-
-            return (
-              <div
-                key={item.key}
-                className="p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-xs space-y-2"
-              >
-                <div className="text-xs font-bold text-[var(--foreground)]">
-                  {item.name}
-                </div>
-
-                <div className="flex items-baseline justify-between pt-1">
-                  <div className="text-2xl font-black text-[var(--foreground)]">
-                    {bsc ? `${bsc.average_score}%` : '—'}
-                  </div>
-                  {bsc && getRatingBadge(bsc.rating)}
-                </div>
-
-                <div className="text-[10px] text-[var(--muted)]">
-                  {submission.entries?.filter(
-                    (e) => e.perspective === item.key,
-                  ).length || 0}{' '}
-                  KPI metric(s)
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <button
+          onClick={() => setActiveTab('ai')}
+          className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'ai'
+              ? 'border-[var(--primary)] text-[var(--primary)]'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
+          }`}
+        >
+          <span>🤖 AI Executive Analysis</span>
+          {aiAnalysis && (
+            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+          )}
+        </button>
       </div>
 
-      {/* KPI Detail Table */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--muted)]">
-          KPI Performance Breakdown (Calculated Results)
-        </h2>
+      {/* TAB 1: BSC Overview & KPI Detail */}
+      {activeTab === 'kpi' && (
+        <div className="space-y-8 animate-fade-in">
+          {/* 4 Balanced Scorecard Perspective Summary Cards */}
+          <div className="space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--muted)]">
+              Balanced Scorecard Perspectives Performance
+            </h2>
 
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-900 border-b border-[var(--border)] uppercase font-bold text-[var(--muted)] tracking-wider">
-                <tr>
-                  <th className="px-4 py-3.5">Perspective</th>
-                  <th className="px-4 py-3.5">Strategic Objective</th>
-                  <th className="px-4 py-3.5">Measurement</th>
-                  <th className="px-4 py-3.5">Unit</th>
-                  <th className="px-4 py-3.5 text-right">Plan</th>
-                  <th className="px-4 py-3.5 text-right">Actual</th>
-                  <th className="px-4 py-3.5 text-right">Achv %</th>
-                  <th className="px-4 py-3.5 text-right">Score</th>
-                  <th className="px-4 py-3.5 text-center">Rating</th>
-                  <th className="px-4 py-3.5">Notes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border)]">
-                {submission.entries?.map((e, idx) => (
-                  <tr
-                    key={e.id || idx}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                {
+                  key: 'FINANCIAL',
+                  name: '1. Financial',
+                },
+                {
+                  key: 'CUSTOMER',
+                  name: '2. Customer',
+                },
+                {
+                  key: 'INTERNAL_PROCESS',
+                  name: '3. Internal Process',
+                },
+                {
+                  key: 'LEARNING_GROWTH',
+                  name: '4. Learning & Growth',
+                },
+              ].map((item) => {
+                const bsc = submission.perspective_scores?.find(
+                  (p) => p.perspective === item.key,
+                );
+
+                return (
+                  <div
+                    key={item.key}
+                    className="p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-xs space-y-2"
                   >
-                    <td className="px-4 py-3 font-semibold text-[var(--foreground)]">
-                      <Badge variant="primary" size="sm">
-                        {e.perspective}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-[var(--foreground)]">
-                      {e.objective}
-                    </td>
-                    <td className="px-4 py-3 text-[var(--muted)]">
-                      {e.measurement}
-                    </td>
-                    <td className="px-4 py-3 font-mono">{e.unit}</td>
-                    <td className="px-4 py-3 font-mono text-right font-medium">
-                      {e.plan_value}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-right font-medium">
-                      {e.actual_value}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-right font-bold text-[var(--primary)]">
-                      {e.achievement_pct !== undefined ? `${e.achievement_pct}%` : '—'}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-right font-bold">
-                      {e.score !== undefined ? `${e.score}%` : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {getRatingBadge(e.rating)}
-                    </td>
-                    <td className="px-4 py-3 text-[var(--muted)] max-w-xs truncate">
-                      {e.notes || '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <div className="text-xs font-bold text-[var(--foreground)]">
+                      {item.name}
+                    </div>
+
+                    <div className="flex items-baseline justify-between pt-1">
+                      <div className="text-2xl font-black text-[var(--foreground)]">
+                        {bsc ? `${bsc.average_score}%` : '—'}
+                      </div>
+                      {bsc && getRatingBadge(bsc.rating)}
+                    </div>
+
+                    <div className="text-[10px] text-[var(--muted)]">
+                      {submission.entries?.filter(
+                        (e) => e.perspective === item.key,
+                      ).length || 0}{' '}
+                      KPI metric(s)
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* KPI Detail Table */}
+          <div className="space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--muted)]">
+              KPI Performance Breakdown (Calculated Results)
+            </h2>
+
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-900 border-b border-[var(--border)] uppercase font-bold text-[var(--muted)] tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3.5">Perspective</th>
+                      <th className="px-4 py-3.5">Strategic Objective</th>
+                      <th className="px-4 py-3.5">Measurement</th>
+                      <th className="px-4 py-3.5">Unit</th>
+                      <th className="px-4 py-3.5 text-right">Plan</th>
+                      <th className="px-4 py-3.5 text-right">Actual</th>
+                      <th className="px-4 py-3.5 text-right">Achv %</th>
+                      <th className="px-4 py-3.5 text-right">Score</th>
+                      <th className="px-4 py-3.5 text-center">Rating</th>
+                      <th className="px-4 py-3.5">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border)]">
+                    {submission.entries?.map((e, idx) => (
+                      <tr
+                        key={e.id || idx}
+                        className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+                      >
+                        <td className="px-4 py-3 font-semibold text-[var(--foreground)]">
+                          <Badge variant="primary" size="sm">
+                            {e.perspective}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-[var(--foreground)]">
+                          {e.objective}
+                        </td>
+                        <td className="px-4 py-3 text-[var(--muted)]">
+                          {e.measurement}
+                        </td>
+                        <td className="px-4 py-3 font-mono">{e.unit}</td>
+                        <td className="px-4 py-3 font-mono text-right font-medium">
+                          {e.plan_value}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-right font-medium">
+                          {e.actual_value}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-right font-bold text-[var(--primary)]">
+                          {e.achievement_pct !== undefined
+                            ? `${e.achievement_pct}%`
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-right font-bold">
+                          {e.score !== undefined ? `${e.score}%` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {getRatingBadge(e.rating)}
+                        </td>
+                        <td className="px-4 py-3 text-[var(--muted)] max-w-xs truncate">
+                          {e.notes || '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* TAB 2: AI Executive Analysis */}
+      {activeTab === 'ai' && (
+        <div className="space-y-8 animate-fade-in">
+          {!aiAnalysis ? (
+            <div className="p-12 rounded-3xl bg-[var(--card)] border border-[var(--border)] text-center space-y-4">
+              <div className="text-4xl">🤖</div>
+              <div className="font-bold text-base text-[var(--foreground)]">
+                No AI Analysis Generated Yet
+              </div>
+              <p className="text-xs text-[var(--muted)] max-w-md mx-auto leading-relaxed">
+                Generate an automated executive assessment powered by Google Gemini AI, analyzing performance across the 4 BSC perspectives, key strengths, areas for improvement, and strategic advice.
+              </p>
+              <div className="pt-2">
+                <Button
+                  onClick={handleGenerateAi}
+                  isLoading={isGeneratingAi}
+                  size="lg"
+                >
+                  ⚡ Generate AI Analysis Now
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Executive Summary Card */}
+              <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">📄</span>
+                    <h2 className="text-base font-bold text-[var(--foreground)]">
+                      Executive Summary & Performance Narrative
+                    </h2>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Badge variant="primary" size="sm">
+                      Model: {aiAnalysis.model_used}
+                    </Badge>
+                    <button
+                      onClick={() => setIsEditAiOpen(true)}
+                      className="text-xs font-semibold text-[var(--primary)] hover:underline cursor-pointer ml-2"
+                    >
+                      ✏️ Edit Narrative
+                    </button>
+                  </div>
+                </div>
+
+                <div className="text-sm leading-relaxed text-[var(--foreground)] whitespace-pre-line bg-slate-50/70 dark:bg-slate-900/70 p-5 rounded-2xl border border-[var(--border)]">
+                  {aiAnalysis.executive_summary}
+                </div>
+              </div>
+
+              {/* Strengths & Improvement Areas Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Strengths */}
+                <div className="p-6 rounded-3xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40 space-y-4">
+                  <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
+                    <span>🌟</span> Key Performance Strengths
+                  </div>
+
+                  <ul className="space-y-2.5">
+                    {aiAnalysis.strengths?.map((s, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2.5 text-xs text-emerald-950 dark:text-emerald-200 leading-relaxed"
+                      >
+                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Improvement Areas */}
+                <div className="p-6 rounded-3xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 space-y-4">
+                  <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-sm">
+                    <span>🚩</span> Areas for Focus & Improvement
+                  </div>
+
+                  <ul className="space-y-2.5">
+                    {aiAnalysis.improvement_areas?.map((item, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2.5 text-xs text-amber-950 dark:text-amber-200 leading-relaxed"
+                      >
+                        <span className="text-amber-600 font-bold">!</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* BSC Perspective Insights */}
+              <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🎯</span>
+                  <h2 className="text-base font-bold text-[var(--foreground)]">
+                    Balanced Scorecard Perspective Insights
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(aiAnalysis.perspective_analysis || {}).map(
+                    ([perspective, narrative]) => (
+                      <div
+                        key={perspective}
+                        className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/80 border border-[var(--border)] space-y-1.5"
+                      >
+                        <div className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider">
+                          {perspective.replace(/_/g, ' ')}
+                        </div>
+                        <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                          {narrative}
+                        </p>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              {/* Actionable Recommendations */}
+              <div className="p-8 rounded-3xl bg-gradient-to-br from-indigo-50/60 to-purple-50/60 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-4">
+                <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
+                  <span>💡</span> Strategic Action Recommendations
+                </div>
+
+                <div className="space-y-2.5">
+                  {aiAnalysis.recommendations?.map((rec, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--card)] border border-[var(--border)] text-xs text-[var(--foreground)] leading-relaxed shadow-2xs"
+                    >
+                      <span className="w-5 h-5 rounded-full bg-[var(--primary-light)] text-[var(--primary)] font-bold flex items-center justify-center shrink-0 text-[10px]">
+                        {idx + 1}
+                      </span>
+                      <span>{rec}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Edit AI Summary Modal */}
+      <Modal
+        isOpen={isEditAiOpen}
+        onClose={() => setIsEditAiOpen(false)}
+        title="Edit Executive Summary Narrative"
+        maxWidth="lg"
+      >
+        <form onSubmit={handleSaveEditedAi} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-[var(--foreground)] uppercase tracking-wider">
+              Executive Summary Text
+            </label>
+            <textarea
+              rows={8}
+              value={editSummary}
+              onChange={(e) => setEditSummary(e.target.value)}
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-3.5 text-xs text-[var(--foreground)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] leading-relaxed"
+              required
+            />
+          </div>
+
+          <div className="pt-4 flex justify-end gap-2 border-t border-[var(--border)]">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsEditAiOpen(false)}
+              disabled={isSavingAi}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={isSavingAi}>
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
