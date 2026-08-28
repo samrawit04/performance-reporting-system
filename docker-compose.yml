@@ -1,0 +1,17 @@
+# ─────────────────────────────────────
+# Performance Reporting System
+# Docker Compose — Development Services
+# ─────────────────────────────────────
+#
+# Database: Uses Neon PostgreSQL (hosted).
+# This file is reserved for any future local development services.
+#
+# To use:
+#   docker-compose up -d
+#
+
+version: "3.8"
+
+services: {}
+  # Future local services can be added here if needed.
+  # For example: Redis for caching, MinIO for file storage, etc.
