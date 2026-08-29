@@ -6,6 +6,7 @@ import { api } from '../../../../lib/api';
 import {
   PerformanceSubmission,
   AiAnalysis,
+  ReviewFeedback,
   SubmissionStatus,
 } from '../../../../lib/types';
 import { Badge } from '../../../../components/ui/Badge';
@@ -22,7 +23,10 @@ export default function SubmissionDetailPage({
     null,
   );
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
-  const [activeTab, setActiveTab] = useState<'kpi' | 'ai'>('kpi');
+  const [reviewFeedback, setReviewFeedback] = useState<ReviewFeedback | null>(
+    null,
+  );
+  const [activeTab, setActiveTab] = useState<'kpi' | 'ai' | 'review'>('kpi');
   const [isLoading, setIsLoading] = useState(true);
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
@@ -41,14 +45,24 @@ export default function SubmissionDetailPage({
 
       // Fetch AI analysis if available
       try {
-        const aiData = await api.get<AiAnalysis>(`/submissions/${id}/ai-analysis`);
+        const aiData = await api.get<AiAnalysis>(
+          `/submissions/${id}/ai-analysis`,
+        );
         if (aiData && aiData.id) {
           setAiAnalysis(aiData);
           setEditSummary(aiData.executive_summary || '');
         }
-      } catch {
-        // AI analysis not yet generated
-      }
+      } catch {}
+
+      // Fetch Review Feedback if available
+      try {
+        const reviewData = await api.get<ReviewFeedback>(
+          `/submissions/${id}/review`,
+        );
+        if (reviewData && reviewData.id) {
+          setReviewFeedback(reviewData);
+        }
+      } catch {}
     } catch (err: any) {
       setError(err.message || 'Failed to load submission details');
     } finally {
@@ -81,7 +95,6 @@ export default function SubmissionDetailPage({
       setAiAnalysis(generated);
       setEditSummary(generated.executive_summary || '');
       setActiveTab('ai');
-      // Update submission status in view
       if (submission) {
         setSubmission({
           ...submission,
@@ -211,6 +224,12 @@ export default function SubmissionDetailPage({
           >
             🤖 {aiAnalysis ? 'Regenerate AI Analysis' : 'Generate AI Analysis'}
           </Button>
+
+          <Link href={`/review/${submission.id}`}>
+            <Button variant="secondary" size="sm">
+              ⚖️ Review Workspace
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -290,12 +309,33 @@ export default function SubmissionDetailPage({
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
           )}
         </button>
+
+        <button
+          onClick={() => setActiveTab('review')}
+          className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'review'
+              ? 'border-[var(--primary)] text-[var(--primary)]'
+              : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
+          }`}
+        >
+          <span>⚖️ CEO / Executive Review</span>
+          {reviewFeedback && (
+            <Badge
+              variant={
+                reviewFeedback.action === 'APPROVED' ? 'success' : 'warning'
+              }
+              size="sm"
+            >
+              {reviewFeedback.action}
+            </Badge>
+          )}
+        </button>
       </div>
 
       {/* TAB 1: BSC Overview & KPI Detail */}
       {activeTab === 'kpi' && (
         <div className="space-y-8 animate-fade-in">
-          {/* 4 Balanced Scorecard Perspective Summary Cards */}
+          {/* 4 BSC Perspectives Summary Cards */}
           <div className="space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--muted)]">
               Balanced Scorecard Perspectives Performance
@@ -303,22 +343,10 @@ export default function SubmissionDetailPage({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                {
-                  key: 'FINANCIAL',
-                  name: '1. Financial',
-                },
-                {
-                  key: 'CUSTOMER',
-                  name: '2. Customer',
-                },
-                {
-                  key: 'INTERNAL_PROCESS',
-                  name: '3. Internal Process',
-                },
-                {
-                  key: 'LEARNING_GROWTH',
-                  name: '4. Learning & Growth',
-                },
+                { key: 'FINANCIAL', name: '1. Financial' },
+                { key: 'CUSTOMER', name: '2. Customer' },
+                { key: 'INTERNAL_PROCESS', name: '3. Internal Process' },
+                { key: 'LEARNING_GROWTH', name: '4. Learning & Growth' },
               ].map((item) => {
                 const bsc = submission.perspective_scores?.find(
                   (p) => p.perspective === item.key,
@@ -564,6 +592,140 @@ export default function SubmissionDetailPage({
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: CEO / Executive Review */}
+      {activeTab === 'review' && (
+        <div className="space-y-8 animate-fade-in">
+          {!reviewFeedback ? (
+            <div className="p-12 rounded-3xl bg-[var(--card)] border border-[var(--border)] text-center space-y-4">
+              <div className="text-4xl">⚖️</div>
+              <div className="font-bold text-base text-[var(--foreground)]">
+                Review Pending
+              </div>
+              <p className="text-xs text-[var(--muted)] max-w-md mx-auto leading-relaxed">
+                This performance report has not yet been reviewed by executive leadership. The CEO or designated reviewer will evaluate results and sign off.
+              </p>
+              <div className="pt-2">
+                <Link href={`/review/${submission.id}`}>
+                  <Button size="md">Go to Review Workspace →</Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Review Decision Banner */}
+              <div
+                className={`p-8 rounded-3xl border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                  reviewFeedback.action === 'APPROVED'
+                    ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/50'
+                    : 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200/80 dark:border-amber-900/50'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={
+                        reviewFeedback.action === 'APPROVED'
+                          ? 'success'
+                          : 'warning'
+                      }
+                    >
+                      {reviewFeedback.action}
+                    </Badge>
+                    <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-wider">
+                      Official Executive Sign-off
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight mt-1">
+                    {reviewFeedback.action === 'APPROVED'
+                      ? 'Performance Report Approved'
+                      : 'Returned for Revision'}
+                  </h2>
+                  <div className="text-xs text-[var(--muted)] mt-1">
+                    Reviewed by:{' '}
+                    <strong className="text-[var(--foreground)]">
+                      {reviewFeedback.reviewer
+                        ? `${reviewFeedback.reviewer.first_name} ${reviewFeedback.reviewer.last_name}`
+                        : 'CEO / Executive'}
+                    </strong>{' '}
+                    on {new Date(reviewFeedback.updated_at).toLocaleDateString()}
+                  </div>
+                </div>
+
+                <Link href={`/review/${submission.id}`}>
+                  <Button variant="outline" size="sm">
+                    ✏️ Edit Review
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Overall Executive Commentary */}
+              <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                  Executive Assessment & Commentary
+                </h3>
+                <p className="text-sm leading-relaxed text-[var(--foreground)] whitespace-pre-line bg-slate-50/70 dark:bg-slate-900/70 p-5 rounded-2xl border border-[var(--border)]">
+                  {reviewFeedback.overall_feedback}
+                </p>
+              </div>
+
+              {/* Perspective Specific Guidance if provided */}
+              {reviewFeedback.perspective_feedback &&
+                Object.values(reviewFeedback.perspective_feedback).some(
+                  (v) => !!v,
+                ) && (
+                  <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                      Perspective-Specific Executive Direction
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Object.entries(
+                        reviewFeedback.perspective_feedback,
+                      ).map(
+                        ([perspective, advice]) =>
+                          advice && (
+                            <div
+                              key={perspective}
+                              className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/80 border border-[var(--border)] space-y-1"
+                            >
+                              <div className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider">
+                                {perspective.replace(/_/g, ' ')}
+                              </div>
+                              <p className="text-xs text-[var(--foreground)] leading-relaxed">
+                                {advice}
+                              </p>
+                            </div>
+                          ),
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {/* Recommended Focus Areas */}
+              {reviewFeedback.recommended_focus_areas &&
+                reviewFeedback.recommended_focus_areas.length > 0 && (
+                  <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                      Strategic Focus Directives for Next Period
+                    </h3>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {reviewFeedback.recommended_focus_areas.map(
+                        (tag, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold text-xs border border-indigo-100 dark:border-indigo-900"
+                          >
+                            🎯 {tag}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                )}
             </div>
           )}
         </div>

@@ -64,14 +64,10 @@ export class PerformanceSubmission {
   @Column({ type: 'uuid', nullable: true })
   source_file_id?: string;
 
-  @OneToMany(() => PerformanceEntry, (entry) => entry.submission, {
-    cascade: true,
-  })
+  @OneToMany(() => PerformanceEntry, (entry) => entry.submission)
   entries: PerformanceEntry[];
 
-  @OneToMany(() => BSCPerspectiveScore, (bsc) => bsc.submission, {
-    cascade: true,
-  })
+  @OneToMany(() => BSCPerspectiveScore, (bsc) => bsc.submission)
   perspective_scores: BSCPerspectiveScore[];
 
   @CreateDateColumn()

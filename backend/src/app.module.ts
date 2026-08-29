@@ -9,9 +9,12 @@ import { KpiModule } from './kpi/kpi.module';
 import { PerformanceModule } from './performance/performance.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { AiModule } from './ai/ai.module';
+import { ReviewModule } from './review/review.module';
+import { MailModule } from './mail/mail.module';
 import { CreateUsersTable1724836800000 } from './migrations/1724836800000-CreateUsersTable';
 import { CreatePhase2Tables1724836900000 } from './migrations/1724836900000-CreatePhase2Tables';
 import { CreateAiAnalysesTable1724837000000 } from './migrations/1724837000000-CreateAiAnalysesTable';
+import { CreateReviewFeedbacksTable1724837100000 } from './migrations/1724837100000-CreateReviewFeedbacksTable';
 
 @Module({
   imports: [
@@ -35,6 +38,7 @@ import { CreateAiAnalysesTable1724837000000 } from './migrations/1724837000000-C
           CreateUsersTable1724836800000,
           CreatePhase2Tables1724836900000,
           CreateAiAnalysesTable1724837000000,
+          CreateReviewFeedbacksTable1724837100000,
         ],
         ssl: {
           rejectUnauthorized: false, // Required for Neon PostgreSQL
@@ -49,6 +53,8 @@ import { CreateAiAnalysesTable1724837000000 } from './migrations/1724837000000-C
     PerformanceModule,
     FileUploadModule,
     AiModule,
+    ReviewModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

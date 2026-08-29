@@ -141,6 +141,25 @@ export interface AiAnalysis {
   updated_at: string;
 }
 
+/** Review Feedback Model */
+export interface ReviewFeedback {
+  id: string;
+  submission_id: string;
+  reviewer_id: string;
+  reviewer?: User;
+  action: ReviewAction;
+  overall_feedback: string;
+  perspective_feedback: {
+    FINANCIAL?: string;
+    CUSTOMER?: string;
+    INTERNAL_PROCESS?: string;
+    LEARNING_GROWTH?: string;
+  };
+  recommended_focus_areas: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 /** Performance Submission */
 export interface PerformanceSubmission {
   id: string;
@@ -159,6 +178,7 @@ export interface PerformanceSubmission {
   entries: PerformanceEntry[];
   perspective_scores: BSCPerspectiveScore[];
   ai_analysis?: AiAnalysis;
+  review_feedback?: ReviewFeedback;
   created_at: string;
   updated_at: string;
 }

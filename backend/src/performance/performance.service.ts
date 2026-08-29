@@ -161,20 +161,25 @@ export class PerformanceService {
       await this.entryRepo.save(calculatedEntry);
     }
 
-    // Replace BSC perspective scores
+    // Replace BSC perspective scores with explicit submission_id
     await this.bscScoreRepo.delete({ submission_id: submissionId });
-    for (const bsc of result.perspectiveScores) {
-      const entity = this.bscScoreRepo.create({
-        ...bsc,
-        submission_id: submissionId,
-      });
-      await this.bscScoreRepo.save(entity);
+    if (result.perspectiveScores && result.perspectiveScores.length > 0) {
+      const bscEntities = result.perspectiveScores.map((bsc) =>
+        this.bscScoreRepo.create({
+          perspective: bsc.perspective,
+          average_score: bsc.average_score,
+          rating: bsc.rating,
+          submission_id: submissionId,
+        }),
+      );
+      await this.bscScoreRepo.save(bscEntities);
     }
 
     // Update overall scores on submission
-    submission.overall_score = result.overallScore;
-    submission.overall_rating = result.overallRating;
-    await this.submissionRepo.save(submission);
+    await this.submissionRepo.update(submissionId, {
+      overall_score: result.overallScore,
+      overall_rating: result.overallRating,
+    });
 
     return this.findById(submissionId);
   }
