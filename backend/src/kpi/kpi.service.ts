@@ -6,6 +6,7 @@ import { ScoringConfig } from './entities/scoring-config.entity';
 import { RatingThreshold } from './entities/rating-threshold.entity';
 import { CreateKpiDefinitionDto } from './dto/create-kpi-definition.dto';
 import { UpdateKpiDefinitionDto } from './dto/update-kpi-definition.dto';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class KpiService {
@@ -16,6 +17,7 @@ export class KpiService {
     private readonly scoringConfigRepo: Repository<ScoringConfig>,
     @InjectRepository(RatingThreshold)
     private readonly ratingThresholdRepo: Repository<RatingThreshold>,
+    private readonly auditService: AuditService,
   ) {}
 
   // --- KPI Definitions ---
@@ -37,25 +39,60 @@ export class KpiService {
 
   async createKpi(dto: CreateKpiDefinitionDto): Promise<KpiDefinition> {
     const kpi = this.kpiDefRepo.create(dto);
-    return this.kpiDefRepo.save(kpi);
+    const saved = await this.kpiDefRepo.save(kpi);
+
+    this.auditService.log({
+      action: 'KPI_CREATED',
+      entity: 'KpiDefinition',
+      entityId: saved.id,
+      details: { objective: saved.objective, perspective: saved.perspective },
+    });
+
+    return saved;
   }
 
   async updateKpi(id: string, dto: UpdateKpiDefinitionDto): Promise<KpiDefinition> {
     const kpi = await this.findKpiById(id);
     Object.assign(kpi, dto);
-    return this.kpiDefRepo.save(kpi);
+    const saved = await this.kpiDefRepo.save(kpi);
+
+    this.auditService.log({
+      action: 'KPI_UPDATED',
+      entity: 'KpiDefinition',
+      entityId: saved.id,
+      details: { changes: dto },
+    });
+
+    return saved;
   }
 
   async toggleKpiActive(id: string): Promise<KpiDefinition> {
     const kpi = await this.findKpiById(id);
     kpi.is_active = !kpi.is_active;
-    return this.kpiDefRepo.save(kpi);
+    const saved = await this.kpiDefRepo.save(kpi);
+
+    this.auditService.log({
+      action: 'KPI_UPDATED',
+      entity: 'KpiDefinition',
+      entityId: saved.id,
+      details: { is_active: saved.is_active },
+    });
+
+    return saved;
   }
 
   async removeKpi(id: string): Promise<{ message: string }> {
     const kpi = await this.findKpiById(id);
     kpi.is_active = false;
     await this.kpiDefRepo.save(kpi);
+
+    this.auditService.log({
+      action: 'KPI_DEACTIVATED',
+      entity: 'KpiDefinition',
+      entityId: kpi.id,
+      details: { objective: kpi.objective },
+    });
+
     return { message: `KPI definition "${kpi.objective}" deactivated.` };
   }
 
@@ -97,7 +134,16 @@ export class KpiService {
       }
     }
 
-    return this.scoringConfigRepo.save(config);
+    const saved = await this.scoringConfigRepo.save(config);
+
+    this.auditService.log({
+      action: 'CONFIG_UPDATED',
+      entity: 'ScoringConfig',
+      entityId: key,
+      details: { config_key: key, value, is_confirmed: isConfirmed },
+    });
+
+    return saved;
   }
 
   // --- Rating Thresholds ---
@@ -126,6 +172,13 @@ export class KpiService {
         saved.push(await this.ratingThresholdRepo.save(item));
       }
     }
+
+    this.auditService.log({
+      action: 'RATING_THRESHOLDS_UPDATED',
+      entity: 'RatingThreshold',
+      details: { updated_count: saved.length },
+    });
+
     return saved;
   }
 }

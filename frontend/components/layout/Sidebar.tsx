@@ -54,6 +54,12 @@ const navItems: NavItem[] = [
     icon: '⚙️',
     roles: ['ADMIN'],
   },
+  {
+    label: 'Audit Logs',
+    href: '/audit',
+    icon: '📜',
+    roles: ['ADMIN'],
+  },
 ];
 
 export function Sidebar() {

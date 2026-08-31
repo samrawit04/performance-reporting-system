@@ -14,6 +14,7 @@ import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { CreateEntryDto } from './dto/create-entry.dto';
 import { Role, SubmissionStatus } from '../common/constants/enums';
 import { User } from '../users/entities/user.entity';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class PerformanceService {
@@ -25,6 +26,7 @@ export class PerformanceService {
     @InjectRepository(BSCPerspectiveScore)
     private readonly bscScoreRepo: Repository<BSCPerspectiveScore>,
     private readonly calculationService: CalculationService,
+    private readonly auditService: AuditService,
   ) {}
 
   async createSubmission(
@@ -62,6 +64,19 @@ export class PerformanceService {
       await this.entryRepo.save(entryEntities);
       await this.recalculate(savedSubmission.id);
     }
+
+    this.auditService.log({
+      userId: currentUser.id,
+      userEmail: currentUser.email,
+      userRole: currentUser.role,
+      action: 'SUBMISSION_CREATED',
+      entity: 'PerformanceSubmission',
+      entityId: savedSubmission.id,
+      details: {
+        period_label: savedSubmission.period_label,
+        entries_count: dto.entries?.length || 0,
+      },
+    });
 
     return this.findById(savedSubmission.id, currentUser);
   }
@@ -138,6 +153,16 @@ export class PerformanceService {
     // Recalculate
     await this.recalculate(id);
 
+    this.auditService.log({
+      userId: currentUser.id,
+      userEmail: currentUser.email,
+      userRole: currentUser.role,
+      action: 'SUBMISSION_UPDATED',
+      entity: 'PerformanceSubmission',
+      entityId: id,
+      details: { entries_count: entriesDto.length },
+    });
+
     return this.findById(id, currentUser);
   }
 
@@ -181,6 +206,16 @@ export class PerformanceService {
       overall_rating: result.overallRating,
     });
 
+    this.auditService.log({
+      action: 'SCORES_CALCULATED',
+      entity: 'PerformanceSubmission',
+      entityId: submissionId,
+      details: {
+        overall_score: result.overallScore,
+        overall_rating: result.overallRating,
+      },
+    });
+
     return this.findById(submissionId);
   }
 
@@ -195,8 +230,22 @@ export class PerformanceService {
     await this.recalculate(id);
 
     // Transition status to CALCULATED (ready for AI analysis in Phase 3)
-    submission.status = SubmissionStatus.CALCULATED;
-    await this.submissionRepo.save(submission);
+    await this.submissionRepo.update(id, {
+      status: SubmissionStatus.CALCULATED,
+    });
+
+    this.auditService.log({
+      userId: currentUser.id,
+      userEmail: currentUser.email,
+      userRole: currentUser.role,
+      action: 'SUBMISSION_SUBMITTED',
+      entity: 'PerformanceSubmission',
+      entityId: id,
+      details: {
+        period_label: submission.period_label,
+        status: SubmissionStatus.CALCULATED,
+      },
+    });
 
     return this.findById(id, currentUser);
   }
@@ -211,6 +260,17 @@ export class PerformanceService {
     }
 
     await this.submissionRepo.remove(submission);
+
+    this.auditService.log({
+      userId: currentUser.id,
+      userEmail: currentUser.email,
+      userRole: currentUser.role,
+      action: 'SUBMISSION_DELETED',
+      entity: 'PerformanceSubmission',
+      entityId: id,
+      details: { period_label: submission.period_label },
+    });
+
     return { message: 'Submission deleted successfully.' };
   }
 }

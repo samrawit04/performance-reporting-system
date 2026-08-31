@@ -104,8 +104,9 @@ export class AiService {
       submission.status === SubmissionStatus.SUBMITTED ||
       submission.status === SubmissionStatus.CALCULATED
     ) {
-      submission.status = SubmissionStatus.AI_ANALYZED;
-      await this.submissionRepo.save(submission);
+      await this.submissionRepo.update(submission.id, {
+        status: SubmissionStatus.AI_ANALYZED,
+      });
     }
 
     return saved;

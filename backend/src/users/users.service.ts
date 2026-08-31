@@ -10,12 +10,14 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly auditService: AuditService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -41,6 +43,14 @@ export class UsersService {
     });
 
     const saved = await this.userRepository.save(user);
+
+    this.auditService.log({
+      action: 'USER_CREATED',
+      entity: 'User',
+      entityId: saved.id,
+      details: { email: saved.email, role: saved.role, department: saved.department },
+    });
+
     // Don't expose password_hash
     delete (saved as Partial<User>).password_hash;
     return saved;
@@ -107,6 +117,14 @@ export class UsersService {
     }
 
     const saved = await this.userRepository.save(user);
+
+    this.auditService.log({
+      action: 'USER_UPDATED',
+      entity: 'User',
+      entityId: saved.id,
+      details: { email: saved.email, changes: updateUserDto },
+    });
+
     delete (saved as Partial<User>).password_hash;
     return saved;
   }
@@ -115,6 +133,14 @@ export class UsersService {
     const user = await this.findById(id);
     user.is_active = !user.is_active;
     const saved = await this.userRepository.save(user);
+
+    this.auditService.log({
+      action: 'USER_UPDATED',
+      entity: 'User',
+      entityId: saved.id,
+      details: { email: saved.email, is_active: saved.is_active },
+    });
+
     delete (saved as Partial<User>).password_hash;
     return saved;
   }
@@ -123,6 +149,14 @@ export class UsersService {
     const user = await this.findById(id);
     user.is_active = false;
     await this.userRepository.save(user);
+
+    this.auditService.log({
+      action: 'USER_DEACTIVATED',
+      entity: 'User',
+      entityId: user.id,
+      details: { email: user.email },
+    });
+
     return { message: `User ${user.email} deactivated successfully` };
   }
 }

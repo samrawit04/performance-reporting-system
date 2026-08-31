@@ -11,10 +11,14 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { AiModule } from './ai/ai.module';
 import { ReviewModule } from './review/review.module';
 import { MailModule } from './mail/mail.module';
+import { ReportModule } from './report/report.module';
+import { AuditModule } from './audit/audit.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { CreateUsersTable1724836800000 } from './migrations/1724836800000-CreateUsersTable';
 import { CreatePhase2Tables1724836900000 } from './migrations/1724836900000-CreatePhase2Tables';
 import { CreateAiAnalysesTable1724837000000 } from './migrations/1724837000000-CreateAiAnalysesTable';
 import { CreateReviewFeedbacksTable1724837100000 } from './migrations/1724837100000-CreateReviewFeedbacksTable';
+import { CreateAuditLogsTable1724837200000 } from './migrations/1724837200000-CreateAuditLogsTable';
 
 @Module({
   imports: [
@@ -39,6 +43,7 @@ import { CreateReviewFeedbacksTable1724837100000 } from './migrations/1724837100
           CreatePhase2Tables1724836900000,
           CreateAiAnalysesTable1724837000000,
           CreateReviewFeedbacksTable1724837100000,
+          CreateAuditLogsTable1724837200000,
         ],
         ssl: {
           rejectUnauthorized: false, // Required for Neon PostgreSQL
@@ -55,6 +60,9 @@ import { CreateReviewFeedbacksTable1724837100000 } from './migrations/1724837100
     AiModule,
     ReviewModule,
     MailModule,
+    ReportModule,
+    AuditModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
