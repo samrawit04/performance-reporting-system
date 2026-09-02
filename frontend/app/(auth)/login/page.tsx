@@ -30,12 +30,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoLogin = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setError(null);
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-indigo-50/40 dark:from-slate-950 dark:to-slate-900">
       <div className="w-full max-w-md bg-[var(--card)] rounded-3xl p-8 md:p-10 shadow-2xl border border-[var(--border)] text-center space-y-6">
@@ -136,48 +130,6 @@ export default function LoginPage() {
             Sign In to System
           </Button>
         </form>
-
-        {/* Demo Quick-Fill Presets */}
-        <div className="pt-4 border-t border-[var(--border)] text-left space-y-3">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] text-center">
-            Demo Credentials (1-Click Fill)
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('admin@performance.com', 'admin123')}
-              className="p-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--primary-light)]/20 transition-all text-left text-xs cursor-pointer group"
-            >
-              <div className="font-bold text-[var(--foreground)] group-hover:text-[var(--primary)]">
-                Admin
-              </div>
-              <div className="text-[10px] text-[var(--muted)]">admin123</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('dawit@performance.com', 'manager123')}
-              className="p-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--primary-light)]/20 transition-all text-left text-xs cursor-pointer group"
-            >
-              <div className="font-bold text-[var(--foreground)] group-hover:text-[var(--primary)]">
-                Manager
-              </div>
-              <div className="text-[10px] text-[var(--muted)]">manager123</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('ceo@performance.com', 'reviewer123')}
-              className="p-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--primary-light)]/20 transition-all text-left text-xs cursor-pointer group"
-            >
-              <div className="font-bold text-[var(--foreground)] group-hover:text-[var(--primary)]">
-                CEO Reviewer
-              </div>
-              <div className="text-[10px] text-[var(--muted)]">reviewer123</div>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
