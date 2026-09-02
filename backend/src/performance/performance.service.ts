@@ -15,6 +15,10 @@ import { CreateEntryDto } from './dto/create-entry.dto';
 import { Role, SubmissionStatus } from '../common/constants/enums';
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
+import { MailService } from '../mail/mail.service';
+import { AuthService } from '../auth/auth.service';
+import { UsersService } from '../users/users.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PerformanceService {
@@ -27,6 +31,10 @@ export class PerformanceService {
     private readonly bscScoreRepo: Repository<BSCPerspectiveScore>,
     private readonly calculationService: CalculationService,
     private readonly auditService: AuditService,
+    private readonly mailService: MailService,
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
 
   async createSubmission(
@@ -247,7 +255,41 @@ export class PerformanceService {
       },
     });
 
+    // Notify CEO / Reviewers with a 7-Day Magic Link
+    this.notifyReviewers(submission, currentUser).catch((err) =>
+      console.warn(`Failed to notify reviewers for submission ${id}:`, err.message),
+    );
+
     return this.findById(id, currentUser);
+  }
+
+  private async notifyReviewers(
+    submission: PerformanceSubmission,
+    submitter: User,
+  ): Promise<void> {
+    const reviewers = await this.usersService.findByRole(Role.REVIEWER);
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+
+    for (const reviewer of reviewers) {
+      if (reviewer.email) {
+        const magicToken = await this.authService.generateMagicLinkToken(
+          reviewer.id,
+          submission.id,
+        );
+        const magicLinkUrl = `${frontendUrl}/auth/magic-link?token=${magicToken}`;
+
+        await this.mailService.sendSubmissionReadyForReview({
+          recipientEmail: reviewer.email,
+          recipientName: `${reviewer.first_name} ${reviewer.last_name}`,
+          managerName: `${submitter.first_name} ${submitter.last_name}`,
+          managerDepartment: submitter.department,
+          submissionLabel: submission.period_label,
+          overallScore: submission.overall_score ?? null,
+          magicLinkUrl,
+        });
+      }
+    }
   }
 
   async remove(id: string, currentUser: User): Promise<{ message: string }> {

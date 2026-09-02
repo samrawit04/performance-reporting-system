@@ -19,6 +19,7 @@ interface AuthContextType {
   logout: () => void;
   hasRole: (...roles: UserRole[]) => boolean;
   refreshProfile: () => Promise<void>;
+  setSession: (token: string, user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,6 +62,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push('/dashboard');
   };
 
+  const setSession = (token: string, newUser: User) => {
+    api.setToken(token);
+    setUser(newUser);
+  };
+
   const logout = () => {
     api.setToken(null);
     setUser(null);
@@ -86,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         hasRole,
         refreshProfile,
+        setSession,
       }}
     >
       {children}

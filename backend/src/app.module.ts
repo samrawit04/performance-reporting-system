@@ -14,11 +14,13 @@ import { MailModule } from './mail/mail.module';
 import { ReportModule } from './report/report.module';
 import { AuditModule } from './audit/audit.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { AggregationModule } from './aggregation/aggregation.module';
 import { CreateUsersTable1724836800000 } from './migrations/1724836800000-CreateUsersTable';
 import { CreatePhase2Tables1724836900000 } from './migrations/1724836900000-CreatePhase2Tables';
 import { CreateAiAnalysesTable1724837000000 } from './migrations/1724837000000-CreateAiAnalysesTable';
 import { CreateReviewFeedbacksTable1724837100000 } from './migrations/1724837100000-CreateReviewFeedbacksTable';
 import { CreateAuditLogsTable1724837200000 } from './migrations/1724837200000-CreateAuditLogsTable';
+import { AddEntryDeliverableAndWeight1724837300000 } from './migrations/1724837300000-AddEntryDeliverableAndWeight';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { CreateAuditLogsTable1724837200000 } from './migrations/1724837200000-Cr
           CreateAiAnalysesTable1724837000000,
           CreateReviewFeedbacksTable1724837100000,
           CreateAuditLogsTable1724837200000,
+          AddEntryDeliverableAndWeight1724837300000,
         ],
         ssl: {
           rejectUnauthorized: false, // Required for Neon PostgreSQL
@@ -63,6 +66,7 @@ import { CreateAuditLogsTable1724837200000 } from './migrations/1724837200000-Cr
     ReportModule,
     AuditModule,
     DashboardModule,
+    AggregationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

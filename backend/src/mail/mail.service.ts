@@ -33,6 +33,136 @@ export class MailService {
   }
 
   /**
+   * Dispatches an email notification to the CEO/Reviewer when a manager submits a report.
+   * Includes the 7-day secure magic link allowing 1-click review access.
+   */
+  async sendSubmissionReadyForReview(params: {
+    recipientEmail: string;
+    recipientName: string;
+    managerName: string;
+    managerDepartment?: string;
+    submissionLabel: string;
+    overallScore: number | null;
+    magicLinkUrl?: string;
+  }): Promise<void> {
+    const {
+      recipientEmail,
+      recipientName,
+      managerName,
+      managerDepartment,
+      submissionLabel,
+      overallScore,
+      magicLinkUrl,
+    } = params;
+
+    const subject = `📋 Performance Report Ready for Review — ${submissionLabel} (${managerName})`;
+
+    const magicButtonHtml = magicLinkUrl
+      ? `<tr>
+           <td style="padding:28px 40px;text-align:center;">
+             <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#4338CA 0%,#6366F1 100%);color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:15px 36px;border-radius:10px;box-shadow:0 4px 16px rgba(99,102,241,0.45);">
+               ⚖️ Open Review Workspace &rarr;
+             </a>
+             <p style="margin:10px 0 0;font-size:11px;color:#9CA3AF;">Secure 1-click review access link valid for 7 days</p>
+           </td>
+         </tr>`
+      : '';
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Performance Report Ready for Review</title>
+</head>
+<body style="margin:0;padding:0;background:#F3F4F6;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);padding:36px 40px;">
+              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:2px;color:#A5B4FC;text-transform:uppercase;">Executive Performance Monitoring System</p>
+              <h1 style="margin:0;font-size:22px;font-weight:700;color:#FFFFFF;">New Performance Report Submitted</h1>
+              <p style="margin:8px 0 0;font-size:13px;color:#C7D2FE;">${submissionLabel}</p>
+            </td>
+          </tr>
+
+          <!-- Manager Details Banner -->
+          <tr>
+            <td style="padding:28px 40px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px 20px;">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 2px;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;">Submitting Executive</p>
+                    <p style="margin:0;font-size:16px;font-weight:700;color:#0F172A;">${managerName}</p>
+                    ${managerDepartment ? `<p style="margin:2px 0 0;font-size:12px;color:#64748B;">Department: ${managerDepartment}</p>` : ''}
+                  </td>
+                  <td align="right">
+                    <p style="margin:0 0 2px;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;">Calculated Score</p>
+                    <p style="margin:0;font-size:24px;font-weight:900;color:#4338CA;">${overallScore !== null && overallScore !== undefined ? `${Number(overallScore).toFixed(1)}%` : 'Pending'}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Notice -->
+          <tr>
+            <td style="padding:20px 40px 0;">
+              <p style="margin:0;font-size:13px;color:#4B5563;line-height:1.7;">
+                Hello <strong>${recipientName}</strong>,<br/>
+                A new Balanced Scorecard performance report has been submitted and auto-calculated.
+                The submission and its Gemini AI analytical breakdown are now ready for your review and sign-off.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Magic Link Button -->
+          ${magicButtonHtml}
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:28px 40px;border-top:1px solid #F3F4F6;margin-top:20px;">
+              <p style="margin:0;font-size:12px;color:#9CA3AF;line-height:1.6;">
+                This is an automated notification from the <strong>Executive Performance Reporting System</strong>.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    const textContent = `Hello ${recipientName},\n\n${managerName} (${managerDepartment || 'Management'}) has submitted a new performance report for "${submissionLabel}".\nCalculated Score: ${overallScore !== null && overallScore !== undefined ? `${Number(overallScore).toFixed(1)}%` : 'Pending'}\n\n${magicLinkUrl ? `Access Review Workspace (7-Day Magic Link):\n${magicLinkUrl}\n\n` : ''}Best regards,\nExecutive Performance System`;
+
+    if (this.transporter) {
+      try {
+        await this.transporter.sendMail({
+          from: this.from,
+          to: recipientEmail,
+          subject,
+          html: htmlContent,
+          text: textContent,
+        });
+        this.logger.log(`Submission review request email sent to ${recipientEmail}`);
+      } catch (err: any) {
+        this.logger.warn(`Failed to send review request email to ${recipientEmail}: ${err.message}`);
+      }
+    } else {
+      this.logger.log(
+        `[Review Request Email Dispatched] To: ${recipientEmail} | Subject: ${subject}\nMagic Link: ${magicLinkUrl}`,
+      );
+    }
+  }
+
+  /**
    * Sends a simple plain-text review notification (e.g. for RETURNED status).
    */
   async sendReviewNotification(
@@ -41,6 +171,7 @@ export class MailService {
     submissionLabel: string,
     action: 'APPROVED' | 'RETURNED',
     feedbackSummary: string,
+    magicLinkUrl?: string,
   ): Promise<void> {
     const isApproved = action === 'APPROVED';
     const subject = isApproved
@@ -49,7 +180,9 @@ export class MailService {
 
     const textContent = `Hello ${recipientName},\n\nYour performance submission for "${submissionLabel}" has been ${
       isApproved ? 'APPROVED by executive review' : 'RETURNED for adjustments'
-    }.\n\nReviewer Feedback:\n${feedbackSummary}\n\nPlease visit the Performance Reporting portal to review details.\n\nBest regards,\nExecutive Management Team`;
+    }.\n\nReviewer Feedback:\n${feedbackSummary}${
+      magicLinkUrl ? `\n\nDirect Portal Access (Secure 7-Day Link):\n${magicLinkUrl}` : ''
+    }\n\nPlease visit the Performance Reporting portal to review details.\n\nBest regards,\nExecutive Management Team`;
 
     if (this.transporter) {
       try {
@@ -85,6 +218,7 @@ export class MailService {
     recommendedFocusAreas?: string[];
     pdfBuffer: Buffer;
     pdfFilename: string;
+    magicLinkUrl?: string;
   }): Promise<void> {
     const {
       recipientEmail,
@@ -97,6 +231,7 @@ export class MailService {
       recommendedFocusAreas = [],
       pdfBuffer,
       pdfFilename,
+      magicLinkUrl,
     } = params;
 
     const subject = `✅ Performance Report Officially Approved — ${submissionLabel}`;
@@ -110,6 +245,17 @@ export class MailService {
             </ul>
           </div>`
         : '';
+
+    const magicLinkHtml = magicLinkUrl
+      ? `<tr>
+           <td style="padding:24px 40px 0;text-align:center;">
+             <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#4338CA 0%,#6366F1 100%);color:#FFFFFF;text-decoration:none;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;box-shadow:0 4px 14px rgba(99,102,241,0.4);">
+               🔗 View Report &amp; Feedback in Portal &rarr;
+             </a>
+             <p style="margin:8px 0 0;font-size:11px;color:#9CA3AF;">Secure 1-click access link valid for 7 days</p>
+           </td>
+         </tr>`
+      : '';
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -139,9 +285,11 @@ export class MailService {
             <td style="padding:28px 40px 0;">
               <table cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:8px;padding:12px 20px;">
-                    <span style="font-size:20px;">✅</span>
-                    <span style="margin-left:10px;font-size:14px;font-weight:700;color:#065F46;">OFFICIALLY APPROVED</span>
+                  <td style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:20px;padding:6px 14px;">
+                    <span style="font-size:12px;font-weight:700;color:#15803D;letter-spacing:0.5px;">✓ OFFICIALLY APPROVED</span>
+                  </td>
+                  <td style="padding-left:12px;font-size:12px;color:#6B7280;">
+                    Reviewed by <strong>${reviewerName}</strong>
                   </td>
                 </tr>
               </table>
@@ -158,14 +306,14 @@ export class MailService {
             </td>
           </tr>
 
-          <!-- Score Summary -->
+          <!-- Score Highlight Box -->
           <tr>
-            <td style="padding:24px 40px 0;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;">
+            <td style="padding:20px 40px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;text-align:center;">
                 <tr>
-                  <td width="50%" style="padding:20px 24px;border-right:1px solid #E5E7EB;">
+                  <td width="50%" style="padding:20px 24px;border-right:1px solid #E2E8F0;">
                     <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#9CA3AF;text-transform:uppercase;">Overall Score</p>
-                    <p style="margin:0;font-size:28px;font-weight:800;color:#4338CA;">${overallScore !== null && overallScore !== undefined ? overallScore + '%' : '—'}</p>
+                    <p style="margin:0;font-size:32px;font-weight:900;color:#4338CA;">${overallScore !== null && overallScore !== undefined ? `${overallScore}%` : '—'}</p>
                   </td>
                   <td width="50%" style="padding:20px 24px;">
                     <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#9CA3AF;text-transform:uppercase;">Performance Rating</p>
@@ -186,6 +334,9 @@ export class MailService {
               ${focusAreasHtml}
             </td>
           </tr>
+
+          <!-- Magic Link CTA Button -->
+          ${magicLinkHtml}
 
           <!-- PDF Attachment Notice -->
           <tr>
@@ -224,7 +375,7 @@ export class MailService {
       to: recipientEmail,
       subject,
       html: htmlContent,
-      text: `Hello ${recipientName},\n\nYour performance report for "${submissionLabel}" has been APPROVED by ${reviewerName}.\n\nOverall Score: ${overallScore ?? '—'}%  |  Rating: ${overallRating ?? 'Satisfactory'}\n\nCEO Feedback:\n${feedbackSummary}\n\nThe official signed PDF report is attached.\n\nBest regards,\nExecutive Management Team`,
+      text: `Hello ${recipientName},\n\nYour performance report for "${submissionLabel}" has been APPROVED by ${reviewerName}.\n\nOverall Score: ${overallScore ?? '—'}%  |  Rating: ${overallRating ?? 'Satisfactory'}\n\nCEO Feedback:\n${feedbackSummary}${magicLinkUrl ? `\n\nView in Portal: ${magicLinkUrl}` : ''}\n\nThe official signed PDF report is attached.\n\nBest regards,\nExecutive Management Team`,
       attachments: [
         {
           filename: pdfFilename,

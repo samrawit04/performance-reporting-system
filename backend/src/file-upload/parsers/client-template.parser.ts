@@ -55,9 +55,11 @@ export class ClientTemplateParser implements FileParser {
         values.forEach((v, idx) => {
           if (v.includes('perspective')) colMap['perspective'] = idx;
           else if (v.includes('objective')) colMap['objective'] = idx;
+          else if (v.includes('deliverable')) colMap['deliverable'] = idx;
           else if (v.includes('measurement') || v.includes('measure'))
             colMap['measurement'] = idx;
           else if (v.includes('unit')) colMap['unit'] = idx;
+          else if (v.includes('weight')) colMap['weight'] = idx;
           else if (v.includes('plan')) colMap['plan'] = idx;
           else if (v.includes('actual')) colMap['actual'] = idx;
           else if (v.includes('note')) colMap['notes'] = idx;
@@ -114,8 +116,10 @@ export class ClientTemplateParser implements FileParser {
 
       const rawPerspective = getCellVal('perspective');
       const rawObjective = getCellVal('objective');
+      const rawDeliverable = getCellVal('deliverable');
       const rawMeasurement = getCellVal('measurement');
       const rawUnit = getCellVal('unit');
+      const rawWeight = getCellVal('weight');
       const rawPlan = getCellVal('plan');
       const rawActual = getCellVal('actual');
       const rawNotes = getCellVal('notes');
@@ -166,8 +170,10 @@ export class ClientTemplateParser implements FileParser {
       entries.push({
         perspective,
         objective: rawObjective,
+        deliverable: rawDeliverable || undefined,
         measurement: rawMeasurement || 'Standard metric',
         unit: rawUnit || 'units',
+        weight: rawWeight ? parseFloat(rawWeight) || 1.0 : 1.0,
         plan_value: planVal,
         actual_value: actualVal,
         notes: rawNotes || undefined,

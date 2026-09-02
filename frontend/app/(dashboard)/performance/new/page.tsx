@@ -24,15 +24,17 @@ export default function NewPerformancePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Table rows with 7 fields
+  // Table rows with fields including Deliverable and Weight
   const [entries, setEntries] = useState<
     Omit<PerformanceEntry, 'id' | 'submission_id'>[]
   >([
     {
       perspective: 'FINANCIAL',
       objective: 'Control operating cost',
+      deliverable: 'Cost reduction & budget variance report',
       measurement: '% budget variance',
       unit: '%',
+      weight: 1.0,
       plan_value: 5.0,
       actual_value: 4.2,
       notes: '',
@@ -56,8 +58,10 @@ export default function NewPerformancePage() {
       kpi_definition_id: t.id,
       perspective: t.perspective,
       objective: t.objective,
+      deliverable: t.description || '',
       measurement: t.measurement,
       unit: t.unit,
+      weight: t.weight || 1.0,
       plan_value: 0,
       actual_value: 0,
       notes: '',
@@ -71,8 +75,10 @@ export default function NewPerformancePage() {
       {
         perspective: 'FINANCIAL',
         objective: '',
+        deliverable: '',
         measurement: '',
         unit: '%',
+        weight: 1.0,
         plan_value: 0,
         actual_value: 0,
         notes: '',
@@ -94,7 +100,7 @@ export default function NewPerformancePage() {
     updated[index] = {
       ...updated[index],
       [field]:
-        field === 'plan_value' || field === 'actual_value'
+        field === 'plan_value' || field === 'actual_value' || field === 'weight'
           ? parseFloat(value) || 0
           : value,
     };
@@ -130,8 +136,10 @@ export default function NewPerformancePage() {
           kpi_definition_id: e.kpi_definition_id,
           perspective: e.perspective,
           objective: e.objective.trim(),
+          deliverable: e.deliverable?.trim() || undefined,
           measurement: e.measurement.trim() || 'Metric',
           unit: e.unit.trim() || '%',
+          weight: e.weight || 1.0,
           plan_value: e.plan_value,
           actual_value: e.actual_value,
           notes: e.notes?.trim() || undefined,
@@ -220,20 +228,22 @@ export default function NewPerformancePage() {
         </div>
       </div>
 
-      {/* 7-Column Interactive Table */}
+      {/* Interactive Table with Deliverable and Weight columns */}
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-900 border-b border-[var(--border)] uppercase font-bold text-[var(--muted)] tracking-wider">
               <tr>
-                <th className="px-4 py-3 w-40">1. Perspective</th>
-                <th className="px-4 py-3 min-w-56">2. Strategic Objective</th>
-                <th className="px-4 py-3 min-w-44">3. Measurement</th>
-                <th className="px-4 py-3 w-24">4. Unit</th>
-                <th className="px-4 py-3 w-28">5. Plan</th>
-                <th className="px-4 py-3 w-28">6. Actual</th>
-                <th className="px-4 py-3 min-w-44">7. Notes (Optional)</th>
-                <th className="px-3 py-3 w-12 text-center"></th>
+                <th className="px-3 py-3 w-36">1. Perspective</th>
+                <th className="px-3 py-3 min-w-44">2. Strategic Objective</th>
+                <th className="px-3 py-3 min-w-44">3. Deliverable / Output</th>
+                <th className="px-3 py-3 min-w-36">4. Measurement</th>
+                <th className="px-3 py-3 w-20">5. Unit</th>
+                <th className="px-3 py-3 w-20 text-center">6. Weight</th>
+                <th className="px-3 py-3 w-24 text-right">7. Plan</th>
+                <th className="px-3 py-3 w-24 text-right">8. Actual</th>
+                <th className="px-3 py-3 min-w-36">9. Notes</th>
+                <th className="px-2 py-3 w-10 text-center"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
@@ -242,7 +252,7 @@ export default function NewPerformancePage() {
                   key={idx}
                   className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
                 >
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
                     <select
                       value={row.perspective}
                       onChange={(e) =>
@@ -261,7 +271,7 @@ export default function NewPerformancePage() {
                     </select>
                   </td>
 
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       value={row.objective}
@@ -270,10 +280,23 @@ export default function NewPerformancePage() {
                       }
                       placeholder="Objective"
                       className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2.5 py-1.5 text-xs text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
+                    >
+                    </input>
+                  </td>
+
+                  <td className="px-2 py-2">
+                    <input
+                      type="text"
+                      value={row.deliverable || ''}
+                      onChange={(e) =>
+                        handleRowChange(idx, 'deliverable', e.target.value)
+                      }
+                      placeholder="e.g. Q3 Cost Report"
+                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2.5 py-1.5 text-xs text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
                     />
                   </td>
 
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       value={row.measurement}
@@ -285,7 +308,7 @@ export default function NewPerformancePage() {
                     />
                   </td>
 
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       value={row.unit}
@@ -297,7 +320,21 @@ export default function NewPerformancePage() {
                     />
                   </td>
 
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      value={row.weight || 1.0}
+                      onChange={(e) =>
+                        handleRowChange(idx, 'weight', e.target.value)
+                      }
+                      placeholder="1.0"
+                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1.5 text-xs font-mono text-center text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
+                    />
+                  </td>
+
+                  <td className="px-2 py-2">
                     <input
                       type="number"
                       step="any"
@@ -306,11 +343,11 @@ export default function NewPerformancePage() {
                         handleRowChange(idx, 'plan_value', e.target.value)
                       }
                       placeholder="0.0"
-                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1.5 text-xs font-mono text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
+                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1.5 text-xs font-mono text-right text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
                     />
                   </td>
 
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
                     <input
                       type="number"
                       step="any"
@@ -319,11 +356,11 @@ export default function NewPerformancePage() {
                         handleRowChange(idx, 'actual_value', e.target.value)
                       }
                       placeholder="0.0"
-                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1.5 text-xs font-mono text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
+                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1.5 text-xs font-mono text-right text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
                     />
                   </td>
 
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       value={row.notes || ''}
@@ -331,7 +368,7 @@ export default function NewPerformancePage() {
                         handleRowChange(idx, 'notes', e.target.value)
                       }
                       placeholder="Optional notes"
-                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2.5 py-1.5 text-xs text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]"
+                      className="w-full rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1.5 text-xs text-[var(--muted)] focus:ring-1 focus:ring-[var(--primary)]"
                     />
                   </td>
 

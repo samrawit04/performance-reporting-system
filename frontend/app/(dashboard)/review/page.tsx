@@ -2,15 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '../../../lib/api';
 import { PerformanceSubmission, SubmissionStatus } from '../../../lib/types';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
+import { useAuth } from '../../../context/auth-context';
 
 export default function ReviewQueuePage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [submissions, setSubmissions] = useState<PerformanceSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'APPROVED'>('ALL');
+  const [departmentFilter, setDepartmentFilter] = useState<string>('ALL');
 
   const fetchQueue = async () => {
     try {
@@ -25,8 +30,12 @@ export default function ReviewQueuePage() {
   };
 
   useEffect(() => {
+    if (user && user.role === 'MANAGER') {
+      router.replace('/performance');
+      return;
+    }
     fetchQueue();
-  }, []);
+  }, [user, router]);
 
   const getStatusBadge = (status: SubmissionStatus) => {
     switch (status) {
@@ -63,10 +72,30 @@ export default function ReviewQueuePage() {
     }
   };
 
+  const departments = Array.from(
+    new Set(
+      submissions
+        .map((s) => s.executive?.department)
+        .filter(Boolean) as string[],
+    ),
+  );
+
   const filteredSubmissions = submissions.filter((sub) => {
-    if (filter === 'APPROVED') return sub.status === 'APPROVED';
-    if (filter === 'PENDING')
-      return sub.status === 'CALCULATED' || sub.status === 'AI_ANALYZED' || sub.status === 'UNDER_REVIEW';
+    if (filter === 'APPROVED' && sub.status !== 'APPROVED') return false;
+    if (
+      filter === 'PENDING' &&
+      !(
+        sub.status === 'CALCULATED' ||
+        sub.status === 'AI_ANALYZED' ||
+        sub.status === 'UNDER_REVIEW'
+      )
+    )
+      return false;
+    if (
+      departmentFilter !== 'ALL' &&
+      sub.executive?.department !== departmentFilter
+    )
+      return false;
     return true;
   });
 
@@ -83,47 +112,64 @@ export default function ReviewQueuePage() {
           </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex bg-[var(--card)] border border-[var(--border)] rounded-xl p-1 shadow-2xs">
-          <button
-            onClick={() => setFilter('ALL')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-              filter === 'ALL'
-                ? 'bg-[var(--primary)] text-white'
-                : 'text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            All ({submissions.length})
-          </button>
-          <button
-            onClick={() => setFilter('PENDING')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-              filter === 'PENDING'
-                ? 'bg-[var(--primary)] text-white'
-                : 'text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            Awaiting Review (
-            {
-              submissions.filter(
-                (s) =>
-                  s.status === 'CALCULATED' ||
-                  s.status === 'AI_ANALYZED' ||
-                  s.status === 'UNDER_REVIEW',
-              ).length
-            }
-            )
-          </button>
-          <button
-            onClick={() => setFilter('APPROVED')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-              filter === 'APPROVED'
-                ? 'bg-[var(--primary)] text-white'
-                : 'text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            Approved ({submissions.filter((s) => s.status === 'APPROVED').length})
-          </button>
+        {/* Filter Tabs & Department Dropdown */}
+        <div className="flex flex-wrap items-center gap-3">
+          {departments.length > 0 && (
+            <select
+              value={departmentFilter}
+              onChange={(e) => setDepartmentFilter(e.target.value)}
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] outline-none"
+            >
+              <option value="ALL">All Departments</option>
+              {departments.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <div className="flex bg-[var(--card)] border border-[var(--border)] rounded-xl p-1 shadow-2xs">
+            <button
+              onClick={() => setFilter('ALL')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                filter === 'ALL'
+                  ? 'bg-[var(--primary)] text-white'
+                  : 'text-[var(--muted)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              All ({submissions.length})
+            </button>
+            <button
+              onClick={() => setFilter('PENDING')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                filter === 'PENDING'
+                  ? 'bg-[var(--primary)] text-white'
+                  : 'text-[var(--muted)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              Awaiting Review (
+              {
+                submissions.filter(
+                  (s) =>
+                    s.status === 'CALCULATED' ||
+                    s.status === 'AI_ANALYZED' ||
+                    s.status === 'UNDER_REVIEW',
+                ).length
+              }
+              )
+            </button>
+            <button
+              onClick={() => setFilter('APPROVED')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                filter === 'APPROVED'
+                  ? 'bg-[var(--primary)] text-white'
+                  : 'text-[var(--muted)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              Approved ({submissions.filter((s) => s.status === 'APPROVED').length})
+            </button>
+          </div>
         </div>
       </div>
 

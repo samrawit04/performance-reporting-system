@@ -24,12 +24,21 @@ export class CreateEntryDto {
   objective: string;
 
   @IsString()
+  @IsOptional()
+  deliverable?: string;
+
+  @IsString()
   @IsNotEmpty({ message: 'Measurement is required' })
   measurement: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Unit is required' })
   unit: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0.01)
+  weight?: number;
 
   @IsNumber()
   @Min(0.0001, { message: 'Plan value must be greater than 0' })

@@ -40,11 +40,17 @@ export class PerformanceEntry {
   @Column()
   objective: string;
 
+  @Column({ type: 'text', nullable: true })
+  deliverable?: string;
+
   @Column()
   measurement: string;
 
   @Column()
   unit: string;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 1.0 })
+  weight: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   plan_value: number;

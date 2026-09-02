@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Body,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -21,6 +22,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('magic-link')
+  verifyMagicLink(@Query('token') token: string) {
+    return this.authService.verifyMagicLinkToken(token);
   }
 
   @Get('me')

@@ -2,20 +2,29 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '../../../lib/api';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
+import { useAuth } from '../../../context/auth-context';
 
 export default function FinalReportsPage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('ALL');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (user && user.role === 'ADMIN') {
+      router.replace('/compliance');
+      return;
+    }
     fetchReports();
-  }, []);
+  }, [user, router]);
 
   const fetchReports = async () => {
     setLoading(true);
@@ -43,6 +52,50 @@ export default function FinalReportsPage() {
     }
   };
 
+  const handleExportCsv = () => {
+    if (filteredReports.length === 0) {
+      alert('No reports to export.');
+      return;
+    }
+
+    const headers = [
+      'Executive Name',
+      'Department',
+      'Reporting Period',
+      'Cadence',
+      'Overall Score (%)',
+      'Overall Rating',
+      'Status',
+      'Date Submitted',
+    ];
+
+    const rows = filteredReports.map((r) => [
+      `"${r.executive ? `${r.executive.first_name} ${r.executive.last_name}` : 'Unknown'}"`,
+      `"${r.executive?.department || 'General'}"`,
+      `"${r.period_label || ''}"`,
+      `"${r.period_type || 'MONTHLY'}"`,
+      r.overall_score !== null && r.overall_score !== undefined ? r.overall_score : '',
+      `"${r.overall_rating || ''}"`,
+      `"${r.status || ''}"`,
+      `"${new Date(r.created_at).toLocaleDateString()}"`,
+    ]);
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute(
+      'download',
+      `Executive_Performance_Summary_${new Date().toISOString().slice(0, 10)}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const getRatingBadgeVariant = (rating?: string): 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' => {
     switch (rating) {
       case 'Excellent':
@@ -58,11 +111,23 @@ export default function FinalReportsPage() {
     }
   };
 
+  const departments = Array.from(
+    new Set(
+      reports
+        .map((r) => r.executive?.department)
+        .filter(Boolean) as string[],
+    ),
+  );
+
   const filteredReports = reports.filter((r) => {
     const executiveName = r.executive ? `${r.executive.first_name} ${r.executive.last_name}` : '';
     const label = r.period_label || '';
     const q = search.toLowerCase();
-    return executiveName.toLowerCase().includes(q) || label.toLowerCase().includes(q);
+    const matchesSearch =
+      executiveName.toLowerCase().includes(q) || label.toLowerCase().includes(q);
+    const matchesDept =
+      departmentFilter === 'ALL' || r.executive?.department === departmentFilter;
+    return matchesSearch && matchesDept;
   });
 
   return (
@@ -74,24 +139,55 @@ export default function FinalReportsPage() {
             Final Executive Performance Reports
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">
-            Browse and download approved Balanced Scorecard executive evaluation PDFs
+            Browse, export consolidated summaries, and download approved Balanced Scorecard executive evaluation PDFs
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchReports} className="self-start gap-1.5 shadow-xs">
-          <span>🔄</span> Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            className="gap-1.5 shadow-xs"
+          >
+            <span>📊</span> Export Summary (CSV)
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchReports}
+            className="gap-1.5 shadow-xs"
+          >
+            <span>🔄</span> Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-xs">
+      <div className="flex flex-wrap items-center gap-3 p-3 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-xs">
         <span className="text-lg text-[var(--muted)] pl-2">🔍</span>
         <input
           type="text"
           placeholder="Search by executive name or reporting period..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent border-none text-xs text-[var(--foreground)] focus:outline-none placeholder:text-[var(--muted)]"
+          className="flex-1 min-w-[200px] bg-transparent border-none text-xs text-[var(--foreground)] focus:outline-none placeholder:text-[var(--muted)]"
         />
+
+        {departments.length > 0 && (
+          <select
+            value={departmentFilter}
+            onChange={(e) => setDepartmentFilter(e.target.value)}
+            className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] outline-none"
+          >
+            <option value="ALL">All Departments</option>
+            {departments.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        )}
+
         {search && (
           <button
             onClick={() => setSearch('')}

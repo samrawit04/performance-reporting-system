@@ -5,10 +5,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   helperText?: string;
   leftIcon?: React.ReactNode;
+  rightElement?: React.ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, leftIcon, className = '', id, ...props }, ref) => {
+  ({ label, error, helperText, leftIcon, rightElement, className = '', id, ...props }, ref) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
@@ -32,13 +33,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={`w-full rounded-lg border bg-[var(--card)] px-3.5 py-2.5 text-sm text-[var(--foreground)] transition-colors focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-75 ${
               leftIcon ? 'pl-10' : ''
-            } ${
+            } ${rightElement ? 'pr-10' : ''} ${
               error
                 ? 'border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[var(--danger)]/20'
                 : 'border-[var(--border)]'
             } ${className}`}
             {...props}
           />
+          {rightElement && (
+            <div className="absolute right-3 flex items-center">
+              {rightElement}
+            </div>
+          )}
         </div>
         {error && <p className="text-xs text-[var(--danger)] font-medium">{error}</p>}
         {helperText && !error && (

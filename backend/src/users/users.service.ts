@@ -70,6 +70,12 @@ export class UsersService {
     return user;
   }
 
+  async findByRole(role: string): Promise<User[]> {
+    return this.userRepository.find({
+      where: { role: role as any, is_active: true },
+    });
+  }
+
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.userRepository
       .createQueryBuilder('user')

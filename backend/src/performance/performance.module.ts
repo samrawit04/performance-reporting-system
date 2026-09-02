@@ -7,6 +7,9 @@ import { PerformanceService } from './performance.service';
 import { PerformanceController } from './performance.controller';
 import { CalculationService } from './calculation.service';
 import { KpiModule } from '../kpi/kpi.module';
+import { MailModule } from '../mail/mail.module';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { KpiModule } from '../kpi/kpi.module';
       BSCPerspectiveScore,
     ]),
     KpiModule,
+    MailModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [PerformanceController],
   providers: [PerformanceService, CalculationService],

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UploadedFile as UploadedFileEntity } from './entities/uploaded-file.entity';
 import { ClientTemplateParser } from './parsers/client-template.parser';
+import { PdfDocParser } from './parsers/pdf-doc.parser';
 import { ParsedPerformanceData } from './parsers/parser.interface';
 import { FileProcessingStatus } from '../common/constants/enums';
 import * as fs from 'fs';
@@ -14,6 +15,7 @@ export class FileUploadService {
     @InjectRepository(UploadedFileEntity)
     private readonly uploadedFileRepo: Repository<UploadedFileEntity>,
     private readonly clientTemplateParser: ClientTemplateParser,
+    private readonly pdfDocParser: PdfDocParser,
   ) {}
 
   async processUpload(
@@ -45,8 +47,15 @@ export class FileUploadService {
     });
     const savedRecord = await this.uploadedFileRepo.save(uploadRecord);
 
-    // Parse with template parser
-    const parsedData = await this.clientTemplateParser.parse(file.buffer);
+    // Select appropriate parser based on file format
+    let parsedData: ParsedPerformanceData;
+    const isPdfOrDoc = await this.pdfDocParser.canParse(file.originalname);
+
+    if (isPdfOrDoc) {
+      parsedData = await this.pdfDocParser.parse(file.buffer, file.originalname);
+    } else {
+      parsedData = await this.clientTemplateParser.parse(file.buffer);
+    }
 
     if (parsedData.errors && parsedData.errors.length > 0) {
       savedRecord.processing_status = FileProcessingStatus.FAILED;
@@ -54,7 +63,7 @@ export class FileUploadService {
       await this.uploadedFileRepo.save(savedRecord);
 
       throw new BadRequestException({
-        message: 'Failed to process Excel file',
+        message: 'Failed to process performance document',
         errors: parsedData.errors,
       });
     }

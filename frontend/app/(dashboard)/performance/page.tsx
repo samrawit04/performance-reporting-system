@@ -6,8 +6,11 @@ import { api } from '../../../lib/api';
 import { PerformanceSubmission, SubmissionStatus } from '../../../lib/types';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
+import { useAuth } from '../../../context/auth-context';
 
 export default function PerformanceListPage() {
+  const { user } = useAuth();
+  const isManager = user?.role === 'MANAGER';
   const [submissions, setSubmissions] = useState<PerformanceSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -75,16 +78,18 @@ export default function PerformanceListPage() {
           </p>
         </div>
 
-        <div className="flex gap-3">
-          <Link href="/performance/upload">
-            <Button variant="outline" size="md">
-              📥 Upload Excel
-            </Button>
-          </Link>
-          <Link href="/performance/new">
-            <Button size="md">+ New Manual Entry</Button>
-          </Link>
-        </div>
+        {isManager && (
+          <div className="flex gap-3">
+            <Link href="/performance/upload">
+              <Button variant="outline" size="md">
+                📥 Upload Excel
+              </Button>
+            </Link>
+            <Link href="/performance/new">
+              <Button size="md">+ New Manual Entry</Button>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Submissions Table */}
@@ -120,19 +125,23 @@ export default function PerformanceListPage() {
                       <div className="font-semibold text-sm text-[var(--foreground)]">
                         No performance submissions yet
                       </div>
-                      <p className="text-xs text-[var(--muted)]">
-                        Get started by uploading an Excel report or creating a manual submission.
-                      </p>
-                      <div className="flex justify-center gap-3 pt-2">
-                        <Link href="/performance/upload">
-                          <Button variant="outline" size="sm">
-                            Upload Excel
-                          </Button>
-                        </Link>
-                        <Link href="/performance/new">
-                          <Button size="sm">Manual Entry</Button>
-                        </Link>
-                      </div>
+                      {isManager && (
+                        <>
+                          <p className="text-xs text-[var(--muted)]">
+                            Get started by uploading an Excel report or creating a manual submission.
+                          </p>
+                          <div className="flex justify-center gap-3 pt-2">
+                            <Link href="/performance/upload">
+                              <Button variant="outline" size="sm">
+                                Upload Excel
+                              </Button>
+                            </Link>
+                            <Link href="/performance/new">
+                              <Button size="sm">Manual Entry</Button>
+                            </Link>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

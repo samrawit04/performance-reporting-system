@@ -10,7 +10,7 @@ import { AiAnalysis } from '../ai/entities/ai-analysis.entity';
 import { ReviewFeedback } from '../review/entities/review-feedback.entity';
 import { PdfReportService } from './pdf-report.service';
 import { User } from '../users/entities/user.entity';
-import { Role } from '../common/constants/enums';
+import { Role, SubmissionStatus } from '../common/constants/enums';
 
 @Injectable()
 export class ReportService {
@@ -30,13 +30,19 @@ export class ReportService {
       .leftJoinAndSelect('sub.executive', 'executive')
       .leftJoinAndSelect('sub.submitter', 'submitter')
       .leftJoinAndSelect('sub.perspective_scores', 'perspective_scores')
+      .where('sub.status IN (:...statuses)', {
+        statuses: [SubmissionStatus.APPROVED, SubmissionStatus.FINALIZED],
+      })
       .orderBy('sub.created_at', 'DESC');
 
-    // Scoped by role: Managers see own reports, Admins/Reviewers see all
-    if (currentUser.role === Role.MANAGER) {
-      query.where('sub.executive_id = :userId OR sub.submitted_by = :userId', {
-        userId: currentUser.id,
-      });
+    // Scoped by role: Managers only see their own approved reports
+    if (currentUser?.role === Role.MANAGER) {
+      query.andWhere(
+        '(sub.executive_id = :userId OR sub.submitted_by = :userId)',
+        {
+          userId: currentUser.id,
+        },
+      );
     }
 
     return query.getMany();

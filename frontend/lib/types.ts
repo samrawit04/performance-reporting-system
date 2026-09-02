@@ -100,8 +100,10 @@ export interface PerformanceEntry {
   kpi_definition_id?: string;
   perspective: BscPerspective;
   objective: string;
+  deliverable?: string;
   measurement: string;
   unit: string;
+  weight?: number;
   plan_value: number;
   actual_value: number;
   notes?: string;

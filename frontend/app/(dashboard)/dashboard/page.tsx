@@ -15,6 +15,8 @@ export default function DashboardPage() {
   const [managerData, setManagerData] = useState<any>(null);
   const [reviewerData, setReviewerData] = useState<any>(null);
   const [adminData, setAdminData] = useState<any>(null);
+  const [aggregationData, setAggregationData] = useState<any>(null);
+  const [orgAggregationData, setOrgAggregationData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,15 +29,21 @@ export default function DashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      if (user.role === 'MANAGER' || user.role === 'ADMIN') {
-        const res = await api.get<any>('/dashboard/manager');
+      if (user.role === 'MANAGER') {
+        const [res, agg] = await Promise.all([
+          api.get<any>('/dashboard/manager'),
+          api.get<any>('/aggregation/me').catch(() => null),
+        ]);
         setManagerData(res);
-      }
-      if (user.role === 'REVIEWER' || user.role === 'ADMIN') {
-        const res = await api.get<any>('/dashboard/reviewer');
+        setAggregationData(agg);
+      } else if (user.role === 'REVIEWER') {
+        const [res, orgAgg] = await Promise.all([
+          api.get<any>('/dashboard/reviewer'),
+          api.get<any>('/aggregation/overview').catch(() => null),
+        ]);
         setReviewerData(res);
-      }
-      if (user.role === 'ADMIN') {
+        setOrgAggregationData(orgAgg);
+      } else if (user.role === 'ADMIN') {
         const res = await api.get<any>('/dashboard/admin');
         setAdminData(res);
       }
@@ -121,14 +129,14 @@ export default function DashboardPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* MANAGER VIEW (and ADMIN preview)                                          */}
+      {/* MANAGER VIEW                                                              */}
       {/* ========================================================================= */}
-      {(user?.role === 'MANAGER' || user?.role === 'ADMIN') && managerData && (
+      {user?.role === 'MANAGER' && managerData && (
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight">
-                {user.role === 'ADMIN' ? 'Manager Performance Overview' : 'My Performance Overview'}
+                My Performance Overview
               </h2>
               <p className="text-xs text-[var(--muted)]">Balanced Scorecard metrics & historical progression</p>
             </div>
@@ -270,6 +278,88 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Quarterly & Annual Scorecard Rollup */}
+          {aggregationData && (
+            <div className="p-6 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="font-bold text-base text-[var(--foreground)]">
+                    Quarterly BSC Scorecard &amp; Annual Rollup ({aggregationData.year})
+                  </h3>
+                  <p className="text-xs text-[var(--muted)]">
+                    Aggregated rolling quarterly averages across the 4 Balanced Scorecard perspectives.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className="text-[10px] font-bold uppercase text-[var(--muted)] block">
+                      Annual Average
+                    </span>
+                    <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                      {aggregationData.yearlyAvgScore !== null
+                        ? `${aggregationData.yearlyAvgScore}%`
+                        : '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                {aggregationData.quarterly?.map((q: any) => (
+                  <div
+                    key={q.quarter}
+                    className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/70 border border-[var(--border)] space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-sm text-[var(--foreground)]">
+                        {q.quarter}
+                      </span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                        {q.avgScore !== null ? `${q.avgScore}%` : 'No data'}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 text-[11px] text-[var(--muted)]">
+                      <div className="flex justify-between">
+                        <span>Financial:</span>
+                        <span className="font-mono text-[var(--foreground)]">
+                          {q.avgPerspectiveScores?.FINANCIAL !== undefined
+                            ? `${q.avgPerspectiveScores.FINANCIAL}%`
+                            : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Customer:</span>
+                        <span className="font-mono text-[var(--foreground)]">
+                          {q.avgPerspectiveScores?.CUSTOMER !== undefined
+                            ? `${q.avgPerspectiveScores.CUSTOMER}%`
+                            : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Internal Process:</span>
+                        <span className="font-mono text-[var(--foreground)]">
+                          {q.avgPerspectiveScores?.INTERNAL_PROCESS !== undefined
+                            ? `${q.avgPerspectiveScores.INTERNAL_PROCESS}%`
+                            : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Learning &amp; Growth:</span>
+                        <span className="font-mono text-[var(--foreground)]">
+                          {q.avgPerspectiveScores?.LEARNING_GROWTH !== undefined
+                            ? `${q.avgPerspectiveScores.LEARNING_GROWTH}%`
+                            : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Recent Submissions Table */}
           <div className="p-6 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
             <div className="flex justify-between items-center">
@@ -344,7 +434,7 @@ export default function DashboardPage() {
       {/* ========================================================================= */}
       {/* REVIEWER VIEW                                                             */}
       {/* ========================================================================= */}
-      {(user?.role === 'REVIEWER' || user?.role === 'ADMIN') && reviewerData && (
+      {user?.role === 'REVIEWER' && reviewerData && (
         <section className="space-y-6 pt-4 border-t border-[var(--border)]">
           <div className="flex items-center justify-between">
             <div>

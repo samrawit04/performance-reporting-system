@@ -3,8 +3,10 @@ import { BscPerspective } from '../../common/constants/enums';
 export interface ParsedEntry {
   perspective: BscPerspective;
   objective: string;
+  deliverable?: string;
   measurement: string;
   unit: string;
+  weight?: number;
   plan_value: number;
   actual_value: number;
   notes?: string;

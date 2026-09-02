@@ -98,11 +98,18 @@ export class CalculationService {
     for (const p of perspectives) {
       const pEntries = calculatedEntries.filter((e) => e.perspective === p);
       if (pEntries.length > 0) {
-        const totalScore = pEntries.reduce(
-          (sum, e) => sum + Number(e.score || 0),
+        // Weighted average: each KPI score × its weight, divided by total weight
+        const totalWeight = pEntries.reduce(
+          (sum, e) => sum + Number(e.weight ?? 1.0),
           0,
         );
-        const avgScore = Number((totalScore / pEntries.length).toFixed(2));
+        const weightedScore = pEntries.reduce(
+          (sum, e) => sum + Number(e.score || 0) * Number(e.weight ?? 1.0),
+          0,
+        );
+        const avgScore = totalWeight > 0
+          ? Number((weightedScore / totalWeight).toFixed(2))
+          : 0;
         const rating = getRating(avgScore);
 
         perspectiveScoreMap[p] = avgScore;

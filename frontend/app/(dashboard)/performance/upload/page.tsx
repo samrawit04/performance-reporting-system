@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../lib/api';
 import {
@@ -11,9 +11,11 @@ import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
 import { Select } from '../../../../components/ui/Select';
 import { Badge } from '../../../../components/ui/Badge';
+import { useAuth } from '../../../../context/auth-context';
 
 export default function ExcelUploadPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [periodType, setPeriodType] = useState<PeriodType>('MONTHLY');
@@ -28,11 +30,18 @@ export default function ExcelUploadPage() {
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  useEffect(() => {
+    if (user && user.role !== 'MANAGER') {
+      router.replace('/dashboard');
+    }
+  }, [user, router]);
+
   const handleFileChange = async (selectedFile: File) => {
     if (!selectedFile) return;
     const ext = selectedFile.name.toLowerCase();
-    if (!ext.endsWith('.xlsx') && !ext.endsWith('.xls')) {
-      setError('Please upload an Excel file (.xlsx or .xls)');
+    const allowed = ['.xlsx', '.xls', '.pdf', '.doc', '.docx', '.txt', '.csv'];
+    if (!allowed.some((a) => ext.endsWith(a))) {
+      setError('Supported formats: Excel (.xlsx, .xls), PDF (.pdf), Word (.doc, .docx), CSV (.csv)');
       return;
     }
 
@@ -184,7 +193,7 @@ export default function ExcelUploadPage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".xlsx,.xls"
+          accept=".xlsx,.xls,.pdf,.doc,.docx,.csv,.txt"
           className="hidden"
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
@@ -199,14 +208,14 @@ export default function ExcelUploadPage() {
           </div>
 
           <div className="font-bold text-sm text-[var(--foreground)]">
-            {file ? file.name : 'Click to select or drag & drop Excel workbook'}
+            {file ? file.name : 'Click to select or drag & drop Performance Document'}
           </div>
 
           <p className="text-xs text-[var(--muted)]">
-            Supports Microsoft Excel (.xlsx, .xls) matching the 7-column template:
+            Supports Microsoft Excel (.xlsx, .xls), PDF (.pdf), Word (.doc, .docx), or CSV:
             <br />
             <span className="font-mono text-[11px] text-[var(--primary)]">
-              Perspective • Objective • Measurement • Unit • Plan • Actual • Notes
+              Perspective • Objective • Deliverable • Measurement • Unit • Weight • Plan • Actual
             </span>
           </p>
 

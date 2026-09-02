@@ -12,6 +12,7 @@ import {
 import { Badge } from '../../../../components/ui/Badge';
 import { Button } from '../../../../components/ui/Button';
 import { Modal } from '../../../../components/ui/Modal';
+import { useAuth } from '../../../../context/auth-context';
 
 export default function SubmissionDetailPage({
   params,
@@ -19,6 +20,9 @@ export default function SubmissionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const { user } = useAuth();
+  const isManager = user?.role === 'MANAGER';
+  const isReviewer = user?.role === 'REVIEWER';
   const [submission, setSubmission] = useState<PerformanceSubmission | null>(
     null,
   );
@@ -207,29 +211,37 @@ export default function SubmissionDetailPage({
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRecalculate}
-            isLoading={isRecalculating}
-          >
-            🔄 Recalculate Scores
-          </Button>
-
-          <Button
-            size="sm"
-            onClick={handleGenerateAi}
-            isLoading={isGeneratingAi}
-            className="shadow-sm"
-          >
-            🤖 {aiAnalysis ? 'Regenerate AI Analysis' : 'Generate AI Analysis'}
-          </Button>
-
-          <Link href={`/review/${submission.id}`}>
-            <Button variant="secondary" size="sm">
-              ⚖️ Review Workspace
+          {/* MANAGER ONLY: Recalculate */}
+          {isManager && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRecalculate}
+              isLoading={isRecalculating}
+            >
+              🔄 Recalculate Scores
             </Button>
-          </Link>
+          )}
+
+          {/* REVIEWER (CEO) ONLY: AI Analysis + Review Workspace */}
+          {isReviewer && (
+            <>
+              <Button
+                size="sm"
+                onClick={handleGenerateAi}
+                isLoading={isGeneratingAi}
+                className="shadow-sm"
+              >
+                🤖 {aiAnalysis ? 'Regenerate AI Analysis' : 'Generate AI Analysis'}
+              </Button>
+
+              <Link href={`/review/${submission.id}`}>
+                <Button variant="secondary" size="sm">
+                  ⚖️ Review Workspace
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -461,17 +473,19 @@ export default function SubmissionDetailPage({
                 No AI Analysis Generated Yet
               </div>
               <p className="text-xs text-[var(--muted)] max-w-md mx-auto leading-relaxed">
-                Generate an automated executive assessment powered by Google Gemini AI, analyzing performance across the 4 BSC perspectives, key strengths, areas for improvement, and strategic advice.
+                An automated executive assessment powered by Google Gemini AI will analyze performance across all 4 BSC perspectives.
               </p>
-              <div className="pt-2">
-                <Button
-                  onClick={handleGenerateAi}
-                  isLoading={isGeneratingAi}
-                  size="lg"
-                >
-                  ⚡ Generate AI Analysis Now
-                </Button>
-              </div>
+              {isReviewer && (
+                <div className="pt-2">
+                  <Button
+                    onClick={handleGenerateAi}
+                    isLoading={isGeneratingAi}
+                    size="lg"
+                  >
+                    ⚡ Generate AI Analysis Now
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
@@ -489,12 +503,14 @@ export default function SubmissionDetailPage({
                     <Badge variant="primary" size="sm">
                       Model: {aiAnalysis.model_used}
                     </Badge>
-                    <button
-                      onClick={() => setIsEditAiOpen(true)}
-                      className="text-xs font-semibold text-[var(--primary)] hover:underline cursor-pointer ml-2"
-                    >
-                      ✏️ Edit Narrative
-                    </button>
+                    {isReviewer && (
+                      <button
+                        onClick={() => setIsEditAiOpen(true)}
+                        className="text-xs font-semibold text-[var(--primary)] hover:underline cursor-pointer ml-2"
+                      >
+                        ✏️ Edit Narrative
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -609,11 +625,13 @@ export default function SubmissionDetailPage({
               <p className="text-xs text-[var(--muted)] max-w-md mx-auto leading-relaxed">
                 This performance report has not yet been reviewed by executive leadership. The CEO or designated reviewer will evaluate results and sign off.
               </p>
-              <div className="pt-2">
-                <Link href={`/review/${submission.id}`}>
-                  <Button size="md">Go to Review Workspace →</Button>
-                </Link>
-              </div>
+              {isReviewer && (
+                <div className="pt-2">
+                  <Link href={`/review/${submission.id}`}>
+                    <Button size="md">Go to Review Workspace →</Button>
+                  </Link>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
@@ -656,11 +674,13 @@ export default function SubmissionDetailPage({
                   </div>
                 </div>
 
-                <Link href={`/review/${submission.id}`}>
-                  <Button variant="outline" size="sm">
-                    ✏️ Edit Review
-                  </Button>
-                </Link>
+                {isReviewer && (
+                  <Link href={`/review/${submission.id}`}>
+                    <Button variant="outline" size="sm">
+                      ✏️ Edit Review
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               {/* Overall Executive Commentary */}

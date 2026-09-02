@@ -14,6 +14,8 @@ import { User } from '../users/entities/user.entity';
 import { MailService } from '../mail/mail.service';
 import { AuditService } from '../audit/audit.service';
 import { ReportService } from '../report/report.service';
+import { AuthService } from '../auth/auth.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ReviewService {
@@ -27,6 +29,8 @@ export class ReviewService {
     private readonly mailService: MailService,
     private readonly auditService: AuditService,
     private readonly reportService: ReportService,
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getReviewQueue(): Promise<PerformanceSubmission[]> {
@@ -118,25 +122,39 @@ export class ReviewService {
 
     const recipient = submission.submitter || submission.executive;
 
-    if (dto.action === ReviewAction.APPROVED && recipient?.email) {
-      // On APPROVAL: generate PDF and send rich HTML email with PDF attachment
-      this.sendApprovalEmailWithPdf(
+    if (recipient?.email) {
+      const frontendUrl =
+        this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+      const magicToken = await this.authService.generateMagicLinkToken(
+        recipient.id,
         submissionId,
-        reviewer,
-        savedFeedback,
-        recipient,
-      ).catch((err) =>
-        this.logger.warn(`Failed to send approval email for submission ${submissionId}: ${err.message}`),
       );
-    } else if (dto.action === ReviewAction.RETURNED && recipient?.email) {
-      // On RETURN: send a simple notification (no PDF)
-      this.mailService.sendReviewNotification(
-        recipient.email,
-        `${recipient.first_name} ${recipient.last_name}`,
-        submission.period_label,
-        'RETURNED',
-        dto.overall_feedback,
-      );
+      const magicLinkUrl = `${frontendUrl}/auth/magic-link?token=${magicToken}`;
+
+      if (dto.action === ReviewAction.APPROVED) {
+        // On APPROVAL: generate PDF and send rich HTML email with PDF attachment
+        this.sendApprovalEmailWithPdf(
+          submissionId,
+          reviewer,
+          savedFeedback,
+          recipient,
+          magicLinkUrl,
+        ).catch((err) =>
+          this.logger.warn(
+            `Failed to send approval email for submission ${submissionId}: ${err.message}`,
+          ),
+        );
+      } else if (dto.action === ReviewAction.RETURNED) {
+        // On RETURN: send a simple notification with magic link (no PDF)
+        this.mailService.sendReviewNotification(
+          recipient.email,
+          `${recipient.first_name} ${recipient.last_name}`,
+          submission.period_label,
+          'RETURNED',
+          dto.overall_feedback,
+          magicLinkUrl,
+        );
+      }
     }
 
     return this.getReviewBySubmission(submissionId) as Promise<ReviewFeedback>;
@@ -151,9 +169,11 @@ export class ReviewService {
     reviewer: User,
     feedback: ReviewFeedback,
     recipient: User,
+    magicLinkUrl?: string,
   ): Promise<void> {
     try {
-      const { buffer, filename } = await this.reportService.generateReportPdf(submissionId);
+      const { buffer, filename } =
+        await this.reportService.generateReportPdf(submissionId);
 
       // Re-fetch submission for score data (status is now APPROVED)
       const updatedSubmission = await this.submissionRepo.findOne({
@@ -172,6 +192,7 @@ export class ReviewService {
         recommendedFocusAreas: feedback.recommended_focus_areas || [],
         pdfBuffer: buffer,
         pdfFilename: filename,
+        magicLinkUrl,
       });
 
       this.logger.log(
