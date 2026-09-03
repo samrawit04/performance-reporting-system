@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useAuth } from '../../../context/auth-context';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -129,10 +130,18 @@ export default function LoginPage() {
                       d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                     />
                   </svg>
-                )}
               </button>
             }
           />
+
+          <div className="flex items-center justify-end pt-1">
+            <Link
+              href="/forgot-password"
+              className="text-xs font-semibold text-[var(--primary)] hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           <Button
             type="submit"

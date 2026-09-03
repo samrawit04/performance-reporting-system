@@ -1,13 +1,18 @@
 import {
   Injectable,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +20,8 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly auditService: AuditService,
+    private readonly mailService: MailService,
+    private readonly configService: ConfigService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User> {
@@ -151,5 +158,74 @@ export class AuthService {
 
   async getProfile(user: User) {
     return this.usersService.findById(user.id);
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmailWithPassword(dto.email);
+
+    if (user && user.is_active) {
+      const resetToken = this.jwtService.sign(
+        {
+          sub: user.id,
+          email: user.email,
+          type: 'PASSWORD_RESET',
+        },
+        { expiresIn: '1h' },
+      );
+
+      const frontendUrl =
+        this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+      const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+      await this.mailService.sendPasswordResetEmail({
+        recipientEmail: user.email,
+        recipientName: `${user.first_name} ${user.last_name}`,
+        resetUrl,
+      });
+
+      this.auditService.log({
+        userId: user.id,
+        userEmail: user.email,
+        userRole: user.role,
+        action: 'PASSWORD_RESET_REQUESTED',
+        entity: 'User',
+        entityId: user.id,
+      });
+    }
+
+    return {
+      message:
+        'If an account with that email exists, a password reset link has been sent to your email.',
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    try {
+      const payload = this.jwtService.verify(dto.token);
+      if (payload.type !== 'PASSWORD_RESET') {
+        throw new BadRequestException('Invalid password reset token type');
+      }
+
+      const user = await this.usersService.findById(payload.sub);
+      if (!user || !user.is_active) {
+        throw new BadRequestException('User account is invalid or deactivated');
+      }
+
+      await this.usersService.update(user.id, { password: dto.password });
+
+      this.auditService.log({
+        userId: user.id,
+        userEmail: user.email,
+        userRole: user.role,
+        action: 'PASSWORD_RESET_COMPLETED',
+        entity: 'User',
+        entityId: user.id,
+      });
+
+      return { message: 'Password has been reset successfully. You can now sign in.' };
+    } catch (err: any) {
+      if (err instanceof BadRequestException) throw err;
+      throw new BadRequestException('This reset link has expired or is invalid.');
+    }
   }
 }

@@ -402,4 +402,104 @@ export class MailService {
       );
     }
   }
+
+  /**
+   * Dispatches a Password Reset link email to a user.
+   */
+  async sendPasswordResetEmail(params: {
+    recipientEmail: string;
+    recipientName: string;
+    resetUrl: string;
+  }): Promise<void> {
+    const { recipientEmail, recipientName, resetUrl } = params;
+    const subject = `🔑 Password Reset Request — Executive Performance System`;
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Reset Request</title>
+</head>
+<body style="margin:0;padding:0;background:#F8FAFC;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);border:1px solid #E2E8F0;">
+
+          <!-- Header Banner -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0D1B2A 0%,#0077B6 100%);padding:32px 36px;">
+              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:1.5px;color:#93C5FD;text-transform:uppercase;">Performance Reporting System</p>
+              <h1 style="margin:0;font-size:20px;font-weight:700;color:#FFFFFF;">Password Reset Request</h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding:28px 36px 0;">
+              <p style="margin:0;font-size:15px;color:#1E293B;">Hello <strong>${recipientName}</strong>,</p>
+              <p style="margin:12px 0 0;font-size:14px;color:#475569;line-height:1.6;">
+                We received a request to reset your password for your Executive Performance System account. Click the button below to set a new password:
+              </p>
+            </td>
+          </tr>
+
+          <!-- Reset Button -->
+          <tr>
+            <td style="padding:24px 36px;text-align:center;">
+              <a href="${resetUrl}" style="display:inline-block;background:#0077B6;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;box-shadow:0 4px 12px rgba(0,119,182,0.35);">
+                Reset My Password &rarr;
+              </a>
+              <p style="margin:12px 0 0;font-size:11px;color:#94A3B8;">This reset link is valid for 1 hour.</p>
+            </td>
+          </tr>
+
+          <!-- Warning -->
+          <tr>
+            <td style="padding:0 36px 28px;">
+              <p style="margin:0;font-size:12px;color:#64748B;line-height:1.5;background:#F1F5F9;padding:12px 16px;border-radius:8px;">
+                If you did not request a password reset, you can safely ignore this email. Your current password will remain unchanged.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 36px;border-top:1px solid #F1F5F9;">
+              <p style="margin:0;font-size:11px;color:#94A3B8;line-height:1.5;">
+                Executive Performance Reporting System &bull; Automated System Security Notification
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    const textContent = `Hello ${recipientName},\n\nYou requested a password reset for your Executive Performance System account.\n\nUse this link to reset your password (valid for 1 hour):\n${resetUrl}\n\nIf you did not request this, please ignore this email.`;
+
+    if (this.transporter) {
+      try {
+        await this.transporter.sendMail({
+          from: this.from,
+          to: recipientEmail,
+          subject,
+          html: htmlContent,
+          text: textContent,
+        });
+        this.logger.log(`Password reset email sent to ${recipientEmail}`);
+      } catch (err: any) {
+        this.logger.warn(`Failed to send password reset email to ${recipientEmail}: ${err.message}`);
+      }
+    } else {
+      this.logger.log(
+        `[Password Reset Link Dispatched] To: ${recipientEmail}\nReset URL: ${resetUrl}`,
+      );
+    }
+  }
 }
