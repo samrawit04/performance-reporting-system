@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Performance Reporting System",
   description:
     "Executive Performance Management and Reporting System — Balanced Scorecard based performance evaluation",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({

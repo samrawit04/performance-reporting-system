@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/auth-context';
@@ -315,8 +315,8 @@ export default function SettingsPage() {
                 Weight assigned to each Balanced Scorecard perspective when computing the overall executive score.
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-center">
-                  <div className="text-xs font-bold text-purple-700 dark:text-purple-300">
+                <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-center">
+                  <div className="text-xs font-bold text-cyan-700 dark:text-cyan-300">
                     Financial
                   </div>
                   <div className="text-lg font-black mt-1">25%</div>

@@ -279,11 +279,11 @@ export default function SubmissionDetailPage({
         </div>
 
         {/* Overall Score Highlight Box */}
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/40 border border-indigo-100 dark:border-indigo-900/60 text-center min-w-44 shrink-0 shadow-inner">
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-sky-950/40 dark:to-cyan-950/40 border border-sky-100 dark:border-sky-900/60 text-center min-w-44 shrink-0 shadow-inner">
           <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Overall Score
           </div>
-          <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+          <div className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-1">
             {submission.overall_score !== null &&
             submission.overall_score !== undefined
               ? `${submission.overall_score}%`
@@ -589,8 +589,8 @@ export default function SubmissionDetailPage({
               </div>
 
               {/* Actionable Recommendations */}
-              <div className="p-8 rounded-3xl bg-gradient-to-br from-indigo-50/60 to-purple-50/60 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-4">
-                <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
+              <div className="p-8 rounded-3xl bg-gradient-to-br from-sky-50/60 to-cyan-50/60 dark:from-sky-950/30 dark:to-cyan-950/30 border border-sky-100 dark:border-sky-900/50 space-y-4">
+                <div className="flex items-center gap-2 text-sky-900 dark:text-sky-200 font-bold text-sm">
                   <span>💡</span> Strategic Action Recommendations
                 </div>
 
@@ -737,7 +737,7 @@ export default function SubmissionDetailPage({
                         (tag, idx) => (
                           <span
                             key={idx}
-                            className="px-3.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold text-xs border border-indigo-100 dark:border-indigo-900"
+                            className="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-semibold text-xs border border-sky-100 dark:border-sky-900"
                           >
                             🎯 {tag}
                           </span>

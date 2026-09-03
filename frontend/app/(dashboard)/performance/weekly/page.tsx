@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -238,7 +238,7 @@ export default function WeeklySnapshotPage() {
                     onChange={(e) =>
                       handleSectionChange(idx, 'actualProgress', e.target.value)
                     }
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] px-3.5 py-2 text-xs font-mono font-bold text-sky-600 dark:text-sky-400"
                     required
                   />
                 </div>

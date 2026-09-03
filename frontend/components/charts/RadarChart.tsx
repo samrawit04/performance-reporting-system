@@ -55,11 +55,11 @@ export function RadarChart({ data, size = 340, className = '' }: RadarChartProps
           <defs>
             {/* Gradient for the BSC Radar area */}
             <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(99, 102, 241, 0.45)" />
-              <stop offset="100%" stopColor="rgba(168, 85, 247, 0.25)" />
+              <stop offset="0%" stopColor="rgba(0, 119, 182, 0.5)" />
+              <stop offset="100%" stopColor="rgba(0, 180, 216, 0.25)" />
             </linearGradient>
             <filter id="radarGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#6366f1" floodOpacity="0.3" />
+              <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#0077b6" floodOpacity="0.3" />
             </filter>
           </defs>
 
@@ -114,7 +114,7 @@ export function RadarChart({ data, size = 340, className = '' }: RadarChartProps
           <path
             d={polygonPath}
             fill="url(#radarGradient)"
-            stroke="#6366f1"
+            stroke="#0077b6"
             strokeWidth="2.5"
             strokeLinejoin="round"
             filter="url(#radarGlow)"
@@ -156,7 +156,7 @@ export function RadarChart({ data, size = 340, className = '' }: RadarChartProps
                   cx={coord.x}
                   cy={coord.y}
                   r={isHovered ? 7 : 5}
-                  fill="#4f46e5"
+                  fill="#0077b6"
                   stroke="#ffffff"
                   strokeWidth="2"
                   className="cursor-pointer transition-all duration-200"
@@ -182,7 +182,7 @@ export function RadarChart({ data, size = 340, className = '' }: RadarChartProps
                   y={labelY}
                   textAnchor={textAnchor}
                   dy={angle === -Math.PI / 2 ? '0.7em' : angle === Math.PI / 2 ? '2.4em' : '1.5em'}
-                  fill="#6366f1"
+                  fill="#0077b6"
                   fontSize="10"
                   fontWeight="800"
                 >
@@ -199,9 +199,9 @@ export function RadarChart({ data, size = 340, className = '' }: RadarChartProps
             className="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-lg shadow-xl border border-slate-700 pointer-events-none transition-all z-20 flex items-center gap-2"
           >
             <span className="font-bold">{hoveredPoint.label}:</span>
-            <span className="text-indigo-300 font-semibold">{hoveredPoint.score.toFixed(1)}%</span>
+            <span className="text-sky-300 font-semibold">{hoveredPoint.score.toFixed(1)}%</span>
             {hoveredPoint.rating && (
-              <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200">
+              <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-sky-500/30 text-sky-200">
                 {hoveredPoint.rating}
               </span>
             )}
@@ -217,7 +217,7 @@ export function RadarChart({ data, size = 340, className = '' }: RadarChartProps
             className="flex items-center justify-between p-2 rounded-xl bg-[var(--card)] border border-[var(--border)] text-xs shadow-2xs"
           >
             <span className="text-[var(--muted)] font-medium truncate pr-1">{d.label}</span>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400">
+            <span className="font-bold text-sky-600 dark:text-sky-400">
               {d.score.toFixed(1)}%
             </span>
           </div>

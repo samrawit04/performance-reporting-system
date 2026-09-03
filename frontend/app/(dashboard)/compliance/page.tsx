@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -151,7 +151,7 @@ export default function ComplianceDashboardPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Compliance Rate
           </div>
-          <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-2">
+          <div className="text-2xl font-black text-sky-600 dark:text-sky-400 mt-2">
             {complianceRate}%
           </div>
           <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">

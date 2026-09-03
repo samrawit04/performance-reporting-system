@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -136,7 +136,7 @@ export default function PerformanceHistoryPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Career Average Score
           </div>
-          <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-2">
+          <div className="text-2xl font-black text-sky-600 dark:text-sky-400 mt-2">
             {avgScore ? `${avgScore}%` : '—'}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -257,7 +257,7 @@ export default function PerformanceHistoryPage() {
                     <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
                       Score
                     </div>
-                    <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+                    <div className="text-2xl font-black text-sky-600 dark:text-sky-400">
                       {hasScore ? `${sub.overall_score}%` : '—'}
                     </div>
                     <div className="mt-0.5">{getRatingBadge(sub.overall_rating)}</div>

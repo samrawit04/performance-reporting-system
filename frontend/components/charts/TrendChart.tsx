@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 
@@ -78,8 +78,8 @@ export function TrendChart({ data, height = 220, className = '' }: TrendChartPro
         >
           <defs>
             <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#0077b6" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#0077b6" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -141,7 +141,7 @@ export function TrendChart({ data, height = 220, className = '' }: TrendChartPro
           <path
             d={pathD}
             fill="none"
-            stroke="#4f46e5"
+            stroke="#0077b6"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -159,7 +159,7 @@ export function TrendChart({ data, height = 220, className = '' }: TrendChartPro
                     y1={padding.top}
                     x2={p.x}
                     y2={padding.top + chartHeight}
-                    stroke="#4f46e5"
+                    stroke="#0077b6"
                     strokeWidth="1.5"
                     strokeDasharray="2,2"
                     opacity="0.8"
@@ -172,7 +172,7 @@ export function TrendChart({ data, height = 220, className = '' }: TrendChartPro
                   cy={p.y}
                   r={isHovered ? 8 : 5}
                   fill="#ffffff"
-                  stroke="#4f46e5"
+                  stroke="#0077b6"
                   strokeWidth="2.5"
                   className="cursor-pointer transition-all duration-150"
                   onMouseEnter={() => setHoveredIdx(i)}
@@ -211,11 +211,11 @@ export function TrendChart({ data, height = 220, className = '' }: TrendChartPro
         {hoveredIdx !== null && (
           <div className="absolute top-1 right-2 bg-slate-900/90 text-white text-xs px-3 py-1 rounded-lg border border-slate-700 shadow-md flex items-center gap-2 pointer-events-none">
             <span className="font-semibold">{data[hoveredIdx].label}:</span>
-            <span className="font-bold text-indigo-300">
+            <span className="font-bold text-sky-300">
               {data[hoveredIdx].overallScore.toFixed(1)}%
             </span>
             {data[hoveredIdx].rating && (
-              <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200 text-[10px] uppercase font-bold">
+              <span className="px-1.5 py-0.5 rounded bg-sky-500/30 text-sky-200 text-[10px] uppercase font-bold">
                 {data[hoveredIdx].rating}
               </span>
             )}

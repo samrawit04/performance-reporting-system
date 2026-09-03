@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useAuth } from '../../../context/auth-context';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -31,12 +32,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-indigo-50/40 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-sky-50/40 dark:from-slate-950 dark:to-slate-900">
       <div className="w-full max-w-md bg-[var(--card)] rounded-3xl p-8 md:p-10 shadow-2xl border border-[var(--border)] text-center space-y-6">
         {/* Header */}
         <div className="space-y-2">
-          <div className="w-14 h-14 bg-[var(--primary-light)] text-2xl rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-            📊
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto shadow-inner overflow-hidden">
+            <Image
+              src="/logo.jpg"
+              alt="Performance RS Logo"
+              width={56}
+              height={56}
+              className="w-full h-full object-cover rounded-2xl"
+              priority
+            />
           </div>
           <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
             Performance RS
@@ -79,7 +87,7 @@ export default function LoginPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1 rounded-md focus:outline-none"
+                className="text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors p-1 rounded-md focus:outline-none"
               >
                 {showPassword ? (
                   <svg

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -208,7 +208,7 @@ export default function FinalReportsPage() {
       <div className="rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm overflow-hidden">
         {loading ? (
           <div className="py-16 text-center space-y-3">
-            <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="w-8 h-8 border-3 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-xs font-semibold text-[var(--muted)]">Loading reports...</p>
           </div>
         ) : filteredReports.length === 0 ? (
@@ -249,7 +249,7 @@ export default function FinalReportsPage() {
                         {report.period_label}
                       </td>
                       <td className="py-4 px-6">
-                        <span className="font-black text-indigo-600 dark:text-indigo-400 text-sm">
+                        <span className="font-black text-sky-600 dark:text-sky-400 text-sm">
                           {report.overall_score !== null ? `${Number(report.overall_score).toFixed(1)}%` : '—'}
                         </span>
                       </td>

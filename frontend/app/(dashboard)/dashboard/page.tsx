@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -106,17 +106,17 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
       {/* Welcome Banner */}
-      <div className="rounded-3xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="rounded-3xl p-8 text-white shadow-xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0d1b2a 0%, #0077b6 55%, #00b4d8 100%)'}}>
         <div className="relative z-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-xs text-xs font-bold uppercase tracking-wider">
             <span>Role:</span>
-            <span className="text-indigo-200">{user?.role}</span>
+            <span className="text-cyan-200">{user?.role}</span>
             {user?.department && <span>• {user.department}</span>}
           </div>
           <h1 className="text-3xl font-black tracking-tight">
             Welcome back, {user?.first_name} {user?.last_name}!
           </h1>
-          <p className="text-indigo-100 max-w-2xl text-sm leading-relaxed">
+          <p className="text-cyan-100 max-w-2xl text-sm leading-relaxed">
             Balanced Scorecard Executive Performance Management — evaluate achievements across Financial, Customer, Internal Process, and Learning & Growth perspectives.
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                 Latest Score
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+                <span className="text-3xl font-black text-sky-600 dark:text-sky-400">
                   {managerData.latestScore ? `${managerData.latestScore.overallScore.toFixed(1)}%` : 'N/A'}
                 </span>
                 {managerData.latestScore?.overallRating && (
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                   <h3 className="font-bold text-base text-[var(--foreground)]">
                     BSC 4 Perspectives Spider
                   </h3>
-                  <span className="text-xs text-indigo-600 font-semibold">Latest Evaluation</span>
+                  <span className="text-xs text-sky-600 font-semibold">Latest Evaluation</span>
                 </div>
                 <p className="text-xs text-[var(--muted)]">
                   Performance balance across Financial, Customer, Process, and Learning.
@@ -266,11 +266,11 @@ export default function DashboardPage() {
                     badge: r.rating !== 'N/A' ? r.rating : undefined,
                     color:
                       r.perspective === 'FINANCIAL'
-                        ? '#6366f1'
+                        ? '#0077b6'
                         : r.perspective === 'CUSTOMER'
                         ? '#06b6d4'
                         : r.perspective === 'INTERNAL_PROCESS'
-                        ? '#8b5cf6'
+                        ? '#00b4d8'
                         : '#10b981',
                   }))}
                 />
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                     <span className="text-[10px] font-bold uppercase text-[var(--muted)] block">
                       Annual Average
                     </span>
-                    <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                    <span className="text-xl font-black text-sky-600 dark:text-sky-400">
                       {aggregationData.yearlyAvgScore !== null
                         ? `${aggregationData.yearlyAvgScore}%`
                         : '—'}
@@ -315,7 +315,7 @@ export default function DashboardPage() {
                       <span className="font-bold text-sm text-[var(--foreground)]">
                         {q.quarter}
                       </span>
-                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                      <span className="text-xs font-black text-sky-600 dark:text-sky-400">
                         {q.avgScore !== null ? `${q.avgScore}%` : 'No data'}
                       </span>
                     </div>
@@ -366,7 +366,7 @@ export default function DashboardPage() {
               <h3 className="font-bold text-base text-[var(--foreground)]">
                 Recent Performance Submissions
               </h3>
-              <Link href="/performance" className="text-xs text-indigo-600 font-bold hover:underline">
+              <Link href="/performance" className="text-xs text-sky-600 font-bold hover:underline">
                 View All Submissions →
               </Link>
             </div>
@@ -399,7 +399,7 @@ export default function DashboardPage() {
                             {sub.status}
                           </Badge>
                         </td>
-                        <td className="py-3.5 font-bold text-indigo-600">
+                        <td className="py-3.5 font-bold text-sky-600">
                           {sub.overallScore !== null ? `${sub.overallScore.toFixed(1)}%` : '—'}
                         </td>
                         <td className="py-3.5">
@@ -483,7 +483,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-xs text-[var(--muted)]">{item.periodLabel}</div>
                     <div className="flex justify-between items-center pt-2 border-t border-[var(--border)]">
-                      <span className="font-extrabold text-indigo-600">
+                      <span className="font-extrabold text-sky-600">
                         {item.overallScore !== null ? `${item.overallScore.toFixed(1)}%` : 'N/A'}
                       </span>
                       <Link href={`/review/${item.id}`}>
@@ -509,7 +509,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Organization Average Score
               </div>
-              <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+              <div className="text-3xl font-black text-sky-600 dark:text-sky-400">
                 {reviewerData.avgOrgScore !== null ? `${reviewerData.avgOrgScore.toFixed(1)}%` : 'N/A'}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Across all finalized evaluations</div>
@@ -613,7 +613,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Active KPI Definitions
               </div>
-              <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+              <div className="text-3xl font-black text-sky-600 dark:text-sky-400">
                 {adminData.platformStats?.totalKpis || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Across 4 BSC perspectives</div>
@@ -649,7 +649,7 @@ export default function DashboardPage() {
                 </h3>
                 <p className="text-xs text-[var(--muted)]">Recent system state transitions & security events</p>
               </div>
-              <Link href="/audit" className="text-xs text-indigo-600 font-bold hover:underline">
+              <Link href="/audit" className="text-xs text-sky-600 font-bold hover:underline">
                 View Full Audit Trail →
               </Link>
             </div>
@@ -658,7 +658,7 @@ export default function DashboardPage() {
               {adminData.recentAuditLogs?.map((log: any) => (
                 <div key={log.id} className="py-3 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
                     <div className="min-w-0">
                       <div className="font-bold text-[var(--foreground)] truncate">
                         {log.action} <span className="text-[var(--muted)] font-normal">on {log.entity}</span>

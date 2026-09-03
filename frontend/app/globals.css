@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 /* ─────────────────────────────────────────────────
    Performance Reporting System — Design Tokens
@@ -14,10 +14,10 @@
   --card: #ffffff;
   --card-foreground: #0f172a;
 
-  /* Colors — Primary (Indigo) */
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #e0e7ff;
+  /* Colors — Primary (Logo Blue) */
+  --primary: #0077b6;
+  --primary-hover: #005f91;
+  --primary-light: #e0f4ff;
   --primary-foreground: #ffffff;
 
   /* Colors — Accent */
@@ -35,7 +35,7 @@
   --info-light: #dbeafe;
 
   /* Colors — BSC Perspectives */
-  --bsc-financial: #8b5cf6;
+  --bsc-financial: #00b4d8;
   --bsc-customer: #06b6d4;
   --bsc-internal: #f59e0b;
   --bsc-learning: #10b981;
@@ -72,7 +72,7 @@
     --border: #1e293b;
     --card: #1e293b;
     --card-foreground: #f1f5f9;
-    --primary-light: #312e81;
+    --primary-light: #003a5c;
   }
 }
 

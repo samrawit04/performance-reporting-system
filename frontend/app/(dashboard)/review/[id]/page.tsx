@@ -219,17 +219,17 @@ export default function ReviewWorkspacePage({
         </div>
 
         {/* Score Box */}
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/40 border border-indigo-100 dark:border-indigo-900/60 text-center min-w-44 shrink-0 shadow-inner">
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-sky-950/40 dark:to-cyan-950/40 border border-sky-100 dark:border-sky-900/60 text-center min-w-44 shrink-0 shadow-inner">
           <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Overall Score
           </div>
-          <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+          <div className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-1">
             {submission.overall_score !== null &&
             submission.overall_score !== undefined
               ? `${submission.overall_score}%`
               : '—'}
           </div>
-          <div className="mt-2 text-xs font-bold text-indigo-700 dark:text-indigo-300">
+          <div className="mt-2 text-xs font-bold text-sky-700 dark:text-sky-300">
             {submission.overall_rating || 'Unrated'}
           </div>
         </div>
@@ -274,8 +274,8 @@ export default function ReviewWorkspacePage({
 
       {/* AI Analysis Summary Preview if present */}
       {aiAnalysis && (
-        <div className="p-6 rounded-3xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-900/50 space-y-3">
-          <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold text-xs uppercase tracking-wider">
+        <div className="p-6 rounded-3xl bg-sky-50/40 dark:bg-sky-950/20 border border-sky-200/70 dark:border-sky-900/50 space-y-3">
+          <div className="flex items-center gap-2 text-sky-900 dark:text-sky-200 font-bold text-xs uppercase tracking-wider">
             <span>🤖</span> AI Executive Summary Reference
           </div>
           <p className="text-xs text-[var(--foreground)] leading-relaxed">

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/auth-context';
@@ -267,7 +267,7 @@ export default function UsersPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1 rounded-md focus:outline-none"
+                className="text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors p-1 rounded-md focus:outline-none"
               >
                 {showPassword ? (
                   <svg

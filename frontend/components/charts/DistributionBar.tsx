@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 
@@ -21,7 +21,7 @@ export function DistributionBar({ items, className = '' }: DistributionBarProps)
       {items.map((item, i) => {
         const total = item.total || 100;
         const pct = Math.min(100, Math.max(0, (item.value / total) * 100));
-        const color = item.color || '#6366f1';
+        const color = item.color || '#0077b6';
 
         return (
           <div key={i} className="space-y-1.5">
