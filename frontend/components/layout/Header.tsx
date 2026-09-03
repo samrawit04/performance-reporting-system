@@ -3,6 +3,7 @@
 import React from 'react';
 import { useAuth } from '../../context/auth-context';
 import { Button } from '../ui/Button';
+import { ThemeToggle } from '../ui/ThemeToggle';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -10,12 +11,14 @@ export function Header() {
   return (
     <header className="h-20 border-b border-[var(--border)] bg-[var(--card)] px-8 md:px-12 flex items-center justify-between sticky top-0 z-20 backdrop-blur-xs">
       <div className="flex items-center gap-3">
-        <h2 className="text-base md:text-lg font-black text-[var(--foreground)] tracking-tight">
+        <h2 className="text-base md:text-lg font-bold text-[var(--foreground)] tracking-tight">
           Executive Performance Management
         </h2>
       </div>
 
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <ThemeToggle />
         {/* User profile capsule */}
         {user && (
           <div className="flex items-center gap-3.5 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full border border-[var(--border)] shadow-xs">

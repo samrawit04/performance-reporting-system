@@ -67,7 +67,7 @@ function MagicLinkHandler() {
 
         {status === 'verifying' && (
           <div className="space-y-2">
-            <h1 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+            <h1 className="text-xl font-bold text-[var(--foreground)] tracking-tight">
               Verifying Secure Access Link
             </h1>
             <p className="text-xs text-[var(--muted)]">
@@ -81,7 +81,7 @@ function MagicLinkHandler() {
 
         {status === 'success' && (
           <div className="space-y-2 animate-fade-in">
-            <h1 className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+            <h1 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tight">
               Authentication Verified!
             </h1>
             <p className="text-xs text-[var(--muted)]">
@@ -92,7 +92,7 @@ function MagicLinkHandler() {
 
         {status === 'error' && (
           <div className="space-y-4 animate-fade-in">
-            <h1 className="text-xl font-black text-red-600 dark:text-red-400 tracking-tight">
+            <h1 className="text-xl font-bold text-red-600 dark:text-red-400 tracking-tight">
               Link Expired or Invalid
             </h1>
             <p className="text-xs text-[var(--muted)] leading-relaxed">

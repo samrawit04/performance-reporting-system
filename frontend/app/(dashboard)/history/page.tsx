@@ -96,11 +96,11 @@ export default function PerformanceHistoryPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-16">
+    <div className="w-full space-y-8 animate-fade-in pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Performance History &amp; Score Progression
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">
@@ -124,7 +124,7 @@ export default function PerformanceHistoryPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Total Submissions
           </div>
-          <div className="text-2xl font-black text-[var(--foreground)] mt-2">
+          <div className="text-2xl font-bold text-[var(--foreground)] mt-2">
             {submissions.length}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -136,7 +136,7 @@ export default function PerformanceHistoryPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Career Average Score
           </div>
-          <div className="text-2xl font-black text-sky-600 dark:text-sky-400 mt-2">
+          <div className="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-2">
             {avgScore ? `${avgScore}%` : '—'}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -148,7 +148,7 @@ export default function PerformanceHistoryPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Peak Performance Score
           </div>
-          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">
             {highestScore ? `${highestScore}%` : '—'}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -160,7 +160,7 @@ export default function PerformanceHistoryPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Latest Rating
           </div>
-          <div className="text-2xl font-black text-[var(--foreground)] mt-2">
+          <div className="text-2xl font-bold text-[var(--foreground)] mt-2">
             {scoredSubmissions[0]?.overall_rating || 'Pending'}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -239,7 +239,7 @@ export default function PerformanceHistoryPage() {
                       {sub.perspective_scores.map((p) => (
                         <div
                           key={p.id || p.perspective}
-                          className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-[var(--border)] text-[11px] font-semibold text-[var(--muted)] flex items-center gap-1.5"
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 border border-[var(--border)] text-[11px] font-semibold text-[var(--muted)] flex items-center gap-1.5"
                         >
                           <span className="uppercase text-[9px] font-bold text-[var(--primary)]">
                             {p.perspective.slice(0, 3)}:
@@ -257,7 +257,7 @@ export default function PerformanceHistoryPage() {
                     <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
                       Score
                     </div>
-                    <div className="text-2xl font-black text-sky-600 dark:text-sky-400">
+                    <div className="text-2xl font-bold text-sky-600 dark:text-sky-400">
                       {hasScore ? `${sub.overall_score}%` : '—'}
                     </div>
                     <div className="mt-0.5">{getRatingBadge(sub.overall_rating)}</div>

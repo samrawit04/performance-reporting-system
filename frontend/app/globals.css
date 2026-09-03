@@ -1,23 +1,25 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ─────────────────────────────────────────────────
    Performance Reporting System — Design Tokens
    ───────────────────────────────────────────────── */
 
 :root {
-  /* Colors — Neutral */
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --muted-foreground: #94a3b8;
-  --border: #e2e8f0;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
+  /* Colors — Neutral (Dark Default) */
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --muted: #94a3b8;
+  --muted-foreground: #64748b;
+  --border: #1e293b;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
 
   /* Colors — Primary (Logo Blue) */
   --primary: #0077b6;
   --primary-hover: #005f91;
-  --primary-light: #e0f4ff;
+  --primary-light: #003a5c;
   --primary-foreground: #ffffff;
 
   /* Colors — Accent */
@@ -62,18 +64,28 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --muted: #94a3b8;
-    --muted-foreground: #64748b;
-    --border: #1e293b;
-    --card: #1e293b;
-    --card-foreground: #f1f5f9;
-    --primary-light: #003a5c;
-  }
+/* Light mode overrides when user switches theme */
+html.light {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --muted-foreground: #94a3b8;
+  --border: #e2e8f0;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary-light: #e0f4ff;
+}
+
+/* Dark mode explicit */
+html.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --muted: #94a3b8;
+  --muted-foreground: #64748b;
+  --border: #1e293b;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --primary-light: #003a5c;
 }
 
 /* Tailwind v4 theme integration */

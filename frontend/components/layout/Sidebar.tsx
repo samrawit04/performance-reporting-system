@@ -94,7 +94,7 @@ export function Sidebar() {
           />
         </div>
         <div className="overflow-hidden">
-          <div className="font-extrabold text-sm text-[var(--foreground)] tracking-tight truncate">
+          <div className="font-bold text-sm text-[var(--foreground)] tracking-tight truncate">
             Performance RS
           </div>
           <div className="text-[10px] text-[var(--muted)] font-semibold uppercase tracking-wider">
@@ -109,9 +109,10 @@ export function Sidebar() {
           Main Menu
         </div>
         {filteredItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== '/dashboard' && pathname?.startsWith(item.href));
+          const hasExactMatch = filteredItems.some((other) => pathname === other.href);
+          const isActive = hasExactMatch
+            ? pathname === item.href
+            : pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href + '/'));
 
           return (
             <Link

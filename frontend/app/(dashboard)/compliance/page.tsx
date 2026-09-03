@@ -104,11 +104,11 @@ export default function ComplianceDashboardPage() {
   const complianceRate = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-16">
+    <div className="w-full space-y-8 animate-fade-in pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Executive Reporting Compliance Tracker
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">
@@ -139,7 +139,7 @@ export default function ComplianceDashboardPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Total Required Managers
           </div>
-          <div className="text-2xl font-black text-[var(--foreground)] mt-2">
+          <div className="text-2xl font-bold text-[var(--foreground)] mt-2">
             {totalCount}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -151,7 +151,7 @@ export default function ComplianceDashboardPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Compliance Rate
           </div>
-          <div className="text-2xl font-black text-sky-600 dark:text-sky-400 mt-2">
+          <div className="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-2">
             {complianceRate}%
           </div>
           <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
@@ -168,7 +168,7 @@ export default function ComplianceDashboardPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Submitted / Approved
           </div>
-          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">
             {submittedCount}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">
@@ -180,7 +180,7 @@ export default function ComplianceDashboardPage() {
           <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Missing Submissions
           </div>
-          <div className="text-2xl font-black text-red-600 dark:text-red-400 mt-2">
+          <div className="text-2xl font-bold text-red-600 dark:text-red-400 mt-2">
             {missingCount}
           </div>
           <div className="text-[11px] text-[var(--muted)] mt-1">

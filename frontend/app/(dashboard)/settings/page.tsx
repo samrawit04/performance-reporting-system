@@ -134,11 +134,11 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+    <div className="w-full space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             System Configuration & KPI Rules
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">
@@ -278,7 +278,7 @@ export default function SettingsPage() {
               <p className="text-xs text-[var(--muted)]">
                 {scoringConfigs.score_cap?.description || 'Maximum score cap for each KPI.'}
               </p>
-              <div className="text-2xl font-black text-[var(--foreground)]">
+              <div className="text-2xl font-bold text-[var(--foreground)]">
                 {scoringConfigs.score_cap?.value ?? 100}%
               </div>
             </div>
@@ -319,25 +319,25 @@ export default function SettingsPage() {
                   <div className="text-xs font-bold text-cyan-700 dark:text-cyan-300">
                     Financial
                   </div>
-                  <div className="text-lg font-black mt-1">25%</div>
+                  <div className="text-lg font-bold mt-1">25%</div>
                 </div>
                 <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-center">
                   <div className="text-xs font-bold text-cyan-700 dark:text-cyan-300">
                     Customer
                   </div>
-                  <div className="text-lg font-black mt-1">25%</div>
+                  <div className="text-lg font-bold mt-1">25%</div>
                 </div>
                 <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-center">
                   <div className="text-xs font-bold text-amber-700 dark:text-amber-300">
                     Internal Process
                   </div>
-                  <div className="text-lg font-black mt-1">25%</div>
+                  <div className="text-lg font-bold mt-1">25%</div>
                 </div>
                 <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center">
                   <div className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
                     Learning & Growth
                   </div>
-                  <div className="text-lg font-black mt-1">25%</div>
+                  <div className="text-lg font-bold mt-1">25%</div>
                 </div>
               </div>
             </div>

@@ -83,7 +83,7 @@ export default function AuditLogsPage() {
 
   if (user?.role !== 'ADMIN') {
     return (
-      <div className="max-w-4xl mx-auto py-16 text-center space-y-3">
+      <div className="w-full py-16 text-center space-y-3">
         <span className="text-4xl">🔒</span>
         <h2 className="text-xl font-bold text-[var(--foreground)]">Administrator Access Only</h2>
         <p className="text-xs text-[var(--muted)]">
@@ -94,11 +94,11 @@ export default function AuditLogsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+    <div className="w-full space-y-8 animate-fade-in pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Security & Governance Audit Trail
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">

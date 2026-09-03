@@ -26,7 +26,7 @@ export function Button({
     primary:
       'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white focus:ring-[var(--primary)] shadow-sm hover:shadow',
     secondary:
-      'bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 focus:ring-slate-400',
+      'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 dark:border-slate-700 focus:ring-slate-400',
     outline:
       'border border-[var(--border)] bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800 text-[var(--foreground)] focus:ring-[var(--primary)]',
     danger:

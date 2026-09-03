@@ -170,7 +170,7 @@ export default function SubmissionDetailPage({
 
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto py-20 text-center space-y-3">
+      <div className="w-full py-20 text-center space-y-3">
         <div className="w-8 h-8 border-4 border-[var(--primary-light)] border-t-[var(--primary)] rounded-full animate-spin mx-auto"></div>
         <p className="text-xs text-[var(--muted)]">Loading submission evaluation...</p>
       </div>
@@ -179,7 +179,7 @@ export default function SubmissionDetailPage({
 
   if (!submission) {
     return (
-      <div className="max-w-6xl mx-auto py-20 text-center space-y-4">
+      <div className="w-full py-20 text-center space-y-4">
         <div className="text-3xl"></div>
         <div className="font-bold text-base text-[var(--foreground)]">
           {error || 'Submission Not Found'}
@@ -194,7 +194,7 @@ export default function SubmissionDetailPage({
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-16">
+    <div className="w-full space-y-8 animate-fade-in pb-16">
       {/* Top Breadcrumb & Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -255,7 +255,7 @@ export default function SubmissionDetailPage({
             </span>
           </div>
 
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             {submission.period_label}
           </h1>
 
@@ -283,7 +283,7 @@ export default function SubmissionDetailPage({
           <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Overall Score
           </div>
-          <div className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-1">
+          <div className="text-3xl font-bold text-sky-600 dark:text-sky-400 mt-1">
             {submission.overall_score !== null &&
             submission.overall_score !== undefined
               ? `${submission.overall_score}%`
@@ -374,7 +374,7 @@ export default function SubmissionDetailPage({
                     </div>
 
                     <div className="flex items-baseline justify-between pt-1">
-                      <div className="text-2xl font-black text-[var(--foreground)]">
+                      <div className="text-2xl font-bold text-[var(--foreground)]">
                         {bsc ? `${bsc.average_score}%` : '—'}
                       </div>
                       {bsc && getRatingBadge(bsc.rating)}
@@ -658,7 +658,7 @@ export default function SubmissionDetailPage({
                       Official Executive Sign-off
                     </span>
                   </div>
-                  <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight mt-1">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] tracking-tight mt-1">
                     {reviewFeedback.action === 'APPROVED'
                       ? 'Performance Report Approved'
                       : 'Returned for Revision'}

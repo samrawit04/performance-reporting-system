@@ -87,7 +87,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6 animate-pulse">
+      <div className="w-full space-y-6 animate-pulse">
         <div className="h-44 bg-[var(--border)] rounded-3xl" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="h-28 bg-[var(--border)] rounded-2xl" />
@@ -104,11 +104,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+    <div className="w-full space-y-8 animate-fade-in pb-12">
       {/* Welcome Banner */}
       <div className="rounded-3xl p-8 text-white shadow-xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0d1b2a 0%, #0077b6 55%, #00b4d8 100%)'}}>
         <div className="relative z-10 space-y-3">
-          <h1 className="text-3xl font-black tracking-tight">
+          <h1 className="text-3xl font-bold tracking-tight">
             Welcome back, {user?.first_name} {user?.last_name}!
           </h1>
           <p className="text-cyan-100 max-w-2xl text-sm leading-relaxed">
@@ -130,7 +130,7 @@ export default function DashboardPage() {
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+              <h2 className="text-xl font-bold text-[var(--foreground)] tracking-tight">
                 My Performance Overview
               </h2>
               <p className="text-xs text-[var(--muted)]">Balanced Scorecard metrics & historical progression</p>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
                 Latest Score
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-sky-600 dark:text-sky-400">
+                <span className="text-3xl font-bold text-sky-600 dark:text-sky-400">
                   {managerData.latestScore ? `${managerData.latestScore.overallScore.toFixed(1)}%` : 'N/A'}
                 </span>
                 {managerData.latestScore?.overallRating && (
@@ -176,7 +176,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Under Review
               </div>
-              <div className="text-3xl font-black text-amber-600">
+              <div className="text-3xl font-bold text-amber-600">
                 {managerData.statusCounts?.underReview || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Awaiting CEO/COO evaluation</div>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Approved Reports
               </div>
-              <div className="text-3xl font-black text-emerald-600">
+              <div className="text-3xl font-bold text-emerald-600">
                 {managerData.statusCounts?.approved || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Finalized executive reports</div>
@@ -198,7 +198,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Drafts
               </div>
-              <div className="text-3xl font-black text-slate-500">
+              <div className="text-3xl font-bold text-slate-500">
                 {managerData.statusCounts?.draft || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Unsubmitted performance drafts</div>
@@ -291,7 +291,7 @@ export default function DashboardPage() {
                     <span className="text-[10px] font-bold uppercase text-[var(--muted)] block">
                       Annual Average
                     </span>
-                    <span className="text-xl font-black text-sky-600 dark:text-sky-400">
+                    <span className="text-xl font-bold text-sky-600 dark:text-sky-400">
                       {aggregationData.yearlyAvgScore !== null
                         ? `${aggregationData.yearlyAvgScore}%`
                         : '—'}
@@ -310,7 +310,7 @@ export default function DashboardPage() {
                       <span className="font-bold text-sm text-[var(--foreground)]">
                         {q.quarter}
                       </span>
-                      <span className="text-xs font-black text-sky-600 dark:text-sky-400">
+                      <span className="text-xs font-bold text-sky-600 dark:text-sky-400">
                         {q.avgScore !== null ? `${q.avgScore}%` : 'No data'}
                       </span>
                     </div>
@@ -433,7 +433,7 @@ export default function DashboardPage() {
         <section className="space-y-6 pt-4 border-t border-[var(--border)]">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+              <h2 className="text-xl font-bold text-[var(--foreground)] tracking-tight">
                 CEO / COO Executive Evaluation Queue
               </h2>
               <p className="text-xs text-[var(--muted)]">
@@ -478,7 +478,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-xs text-[var(--muted)]">{item.periodLabel}</div>
                     <div className="flex justify-between items-center pt-2 border-t border-[var(--border)]">
-                      <span className="font-extrabold text-sky-600">
+                      <span className="font-bold text-sky-600">
                         {item.overallScore !== null ? `${item.overallScore.toFixed(1)}%` : 'N/A'}
                       </span>
                       <Link href={`/review/${item.id}`}>
@@ -504,7 +504,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Organization Average Score
               </div>
-              <div className="text-3xl font-black text-sky-600 dark:text-sky-400">
+              <div className="text-3xl font-bold text-sky-600 dark:text-sky-400">
                 {reviewerData.avgOrgScore !== null ? `${reviewerData.avgOrgScore.toFixed(1)}%` : 'N/A'}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Across all finalized evaluations</div>
@@ -514,7 +514,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Total Submissions Pipeline
               </div>
-              <div className="text-3xl font-black text-[var(--foreground)]">
+              <div className="text-3xl font-bold text-[var(--foreground)]">
                 {reviewerData.statusCounts?.total || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">
@@ -548,7 +548,7 @@ export default function DashboardPage() {
         <section className="space-y-6 pt-4 border-t border-[var(--border)]">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-black text-[var(--foreground)] tracking-tight">
+              <h2 className="text-xl font-bold text-[var(--foreground)] tracking-tight">
                 System Administration & Governance
               </h2>
               <p className="text-xs text-[var(--muted)]">
@@ -594,7 +594,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Total Users
               </div>
-              <div className="text-3xl font-black text-[var(--foreground)]">
+              <div className="text-3xl font-bold text-[var(--foreground)]">
                 {adminData.platformStats?.totalUsers || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">
@@ -608,7 +608,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Active KPI Definitions
               </div>
-              <div className="text-3xl font-black text-sky-600 dark:text-sky-400">
+              <div className="text-3xl font-bold text-sky-600 dark:text-sky-400">
                 {adminData.platformStats?.totalKpis || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Across 4 BSC perspectives</div>
@@ -618,7 +618,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Total Submissions
               </div>
-              <div className="text-3xl font-black text-[var(--foreground)]">
+              <div className="text-3xl font-bold text-[var(--foreground)]">
                 {adminData.platformStats?.totalSubmissions || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Submitted through manual or Excel input</div>
@@ -628,7 +628,7 @@ export default function DashboardPage() {
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
                 Pending Reviews
               </div>
-              <div className="text-3xl font-black text-amber-600">
+              <div className="text-3xl font-bold text-amber-600">
                 {adminData.platformStats?.pendingReviewsCount || 0}
               </div>
               <div className="text-xs text-[var(--muted)] mt-2">Awaiting executive review</div>

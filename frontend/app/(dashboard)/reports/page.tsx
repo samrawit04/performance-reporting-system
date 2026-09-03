@@ -131,11 +131,11 @@ export default function FinalReportsPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+    <div className="w-full space-y-8 animate-fade-in pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Final Executive Performance Reports
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">
@@ -249,7 +249,7 @@ export default function FinalReportsPage() {
                         {report.period_label}
                       </td>
                       <td className="py-4 px-6">
-                        <span className="font-black text-sky-600 dark:text-sky-400 text-sm">
+                        <span className="font-bold text-sky-600 dark:text-sky-400 text-sm">
                           {report.overall_score !== null ? `${Number(report.overall_score).toFixed(1)}%` : '—'}
                         </span>
                       </td>

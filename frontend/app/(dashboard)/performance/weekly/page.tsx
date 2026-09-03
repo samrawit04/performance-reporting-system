@@ -126,11 +126,11 @@ export default function WeeklySnapshotPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-16">
+    <div className="w-full space-y-8 animate-fade-in pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Weekly Progress Snapshot
           </h1>
           <p className="text-xs text-[var(--muted)] mt-1">

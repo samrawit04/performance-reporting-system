@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '../../../context/auth-context';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
+import { ThemeToggle } from '../../../components/ui/ThemeToggle';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -32,7 +33,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-sky-50/40 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-sky-50/40 dark:from-slate-950 dark:to-slate-900 relative">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md bg-[var(--card)] rounded-3xl p-8 md:p-10 shadow-2xl border border-[var(--border)] text-center space-y-6">
         {/* Header */}
         <div className="space-y-2">
@@ -46,7 +51,7 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             Performance RS
           </h1>
           <p className="text-sm text-[var(--muted)]">

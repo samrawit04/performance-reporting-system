@@ -136,7 +136,7 @@ export default function ReviewWorkspacePage({
 
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto py-20 text-center space-y-3">
+      <div className="w-full py-20 text-center space-y-3">
         <div className="w-8 h-8 border-4 border-[var(--primary-light)] border-t-[var(--primary)] rounded-full animate-spin mx-auto"></div>
         <p className="text-xs text-[var(--muted)]">Loading review workspace...</p>
       </div>
@@ -145,7 +145,7 @@ export default function ReviewWorkspacePage({
 
   if (!submission) {
     return (
-      <div className="max-w-6xl mx-auto py-20 text-center space-y-4">
+      <div className="w-full py-20 text-center space-y-4">
         <div className="text-3xl"></div>
         <div className="font-bold text-base text-[var(--foreground)]">
           {error || 'Submission Not Found'}
@@ -160,7 +160,7 @@ export default function ReviewWorkspacePage({
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-16">
+    <div className="w-full space-y-8 animate-fade-in pb-16">
       {/* Top Breadcrumb & Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -195,7 +195,7 @@ export default function ReviewWorkspacePage({
             </span>
           </div>
 
-          <h1 className="text-2xl font-black text-[var(--foreground)] tracking-tight">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
             {submission.period_label}
           </h1>
 
@@ -223,7 +223,7 @@ export default function ReviewWorkspacePage({
           <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
             Overall Score
           </div>
-          <div className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-1">
+          <div className="text-3xl font-bold text-sky-600 dark:text-sky-400 mt-1">
             {submission.overall_score !== null &&
             submission.overall_score !== undefined
               ? `${submission.overall_score}%`
@@ -260,7 +260,7 @@ export default function ReviewWorkspacePage({
                 <div className="text-xs font-bold text-[var(--foreground)]">
                   {item.name}
                 </div>
-                <div className="text-2xl font-black text-[var(--foreground)]">
+                <div className="text-2xl font-bold text-[var(--foreground)]">
                   {bsc ? `${bsc.average_score}%` : '—'}
                 </div>
                 <div className="text-[11px] font-semibold text-[var(--primary)]">
