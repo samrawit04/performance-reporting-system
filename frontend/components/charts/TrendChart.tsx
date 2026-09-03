@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 
@@ -26,7 +26,7 @@ export function TrendChart({ data, height = 220, className = '' }: TrendChartPro
         className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border)] p-8 text-center text-sm text-[var(--muted)] ${className}`}
         style={{ height }}
       >
-        <span className="text-2xl mb-1">📈</span>
+        
         <p className="font-medium">No historical performance records yet.</p>
         <p className="text-xs text-[var(--muted)]">Evaluated periods will populate this trend graph.</p>
       </div>

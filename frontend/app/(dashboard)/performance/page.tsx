@@ -82,7 +82,7 @@ export default function PerformanceListPage() {
           <div className="flex gap-3">
             <Link href="/performance/upload">
               <Button variant="outline" size="md">
-                📥 Upload Excel
+                 Upload Excel
               </Button>
             </Link>
             <Link href="/performance/new">

@@ -146,7 +146,7 @@ export default function ReviewWorkspacePage({
   if (!submission) {
     return (
       <div className="max-w-6xl mx-auto py-20 text-center space-y-4">
-        <div className="text-3xl">⚠️</div>
+        <div className="text-3xl"></div>
         <div className="font-bold text-base text-[var(--foreground)]">
           {error || 'Submission Not Found'}
         </div>
@@ -178,7 +178,7 @@ export default function ReviewWorkspacePage({
 
         <Link href={`/performance/${submission.id}`}>
           <Button variant="outline" size="sm">
-            👁️ View Public Report
+             View Public Report
           </Button>
         </Link>
       </div>
@@ -321,7 +321,7 @@ export default function ReviewWorkspacePage({
               />
               <div>
                 <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                  ✅ Approve Performance Report
+                   Approve Performance Report
                 </div>
                 <div className="text-[11px] text-[var(--muted)]">
                   Sign off and approve the evaluation.
@@ -346,7 +346,7 @@ export default function ReviewWorkspacePage({
               />
               <div>
                 <div className="text-xs font-bold text-amber-800 dark:text-amber-300">
-                  ↩️ Return to Submitter for Revision
+                   Return to Submitter for Revision
                 </div>
                 <div className="text-[11px] text-[var(--muted)]">
                   Request changes or additional context.
@@ -492,8 +492,8 @@ export default function ReviewWorkspacePage({
 
           <Button type="submit" isLoading={isSubmitting} size="lg">
             {action === 'APPROVED'
-              ? '✅ Confirm & Approve Report'
-              : '↩️ Return Report to Submitter'}
+              ? ' Confirm & Approve Report'
+              : ' Return Report to Submitter'}
           </Button>
         </div>
       </form>

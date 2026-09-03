@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -38,7 +38,7 @@ export default function WeeklySnapshotPage() {
     {
       perspective: 'FINANCIAL',
       title: '1. Financial Perspective',
-      icon: '💰',
+      icon: '',
       objective: 'Budget tracking & cost management',
       deliverable: 'Weekly expense reconciliations',
       plannedMilestone: 100,
@@ -48,7 +48,7 @@ export default function WeeklySnapshotPage() {
     {
       perspective: 'CUSTOMER',
       title: '2. Customer / Stakeholder Perspective',
-      icon: '🤝',
+      icon: '',
       objective: 'Client SLA compliance & client satisfaction',
       deliverable: 'Weekly SLA delivery report',
       plannedMilestone: 100,
@@ -58,7 +58,7 @@ export default function WeeklySnapshotPage() {
     {
       perspective: 'INTERNAL_PROCESS',
       title: '3. Internal Process & Operations',
-      icon: '⚙️',
+      icon: '',
       objective: 'Process turnaround time & quality control',
       deliverable: 'Operational throughput audit',
       plannedMilestone: 100,
@@ -68,7 +68,7 @@ export default function WeeklySnapshotPage() {
     {
       perspective: 'LEARNING_GROWTH',
       title: '4. Learning & Team Growth',
-      icon: '🌱',
+      icon: '',
       objective: 'Team training, innovation & capabilities',
       deliverable: 'Weekly knowledge transfer session',
       plannedMilestone: 100,
@@ -147,7 +147,7 @@ export default function WeeklySnapshotPage() {
 
       {error && (
         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
-          ⚠️ {error}
+           {error}
         </div>
       )}
 
@@ -171,7 +171,6 @@ export default function WeeklySnapshotPage() {
               className="p-6 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-xs space-y-4"
             >
               <div className="flex items-center gap-2 font-bold text-sm text-[var(--foreground)] border-b border-[var(--border)] pb-3">
-                <span className="text-lg">{section.icon}</span>
                 <span>{section.title}</span>
               </div>
 
@@ -271,7 +270,7 @@ export default function WeeklySnapshotPage() {
           </Link>
 
           <Button type="submit" isLoading={isSubmitting} size="lg">
-            ⚡ Save &amp; Record Weekly Snapshot &rarr;
+            Save &amp; Record Weekly Snapshot &rarr;
           </Button>
         </div>
       </form>

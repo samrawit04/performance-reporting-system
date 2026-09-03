@@ -180,7 +180,7 @@ export default function SubmissionDetailPage({
   if (!submission) {
     return (
       <div className="max-w-6xl mx-auto py-20 text-center space-y-4">
-        <div className="text-3xl">⚠️</div>
+        <div className="text-3xl"></div>
         <div className="font-bold text-base text-[var(--foreground)]">
           {error || 'Submission Not Found'}
         </div>
@@ -237,7 +237,7 @@ export default function SubmissionDetailPage({
 
               <Link href={`/review/${submission.id}`}>
                 <Button variant="secondary" size="sm">
-                  ⚖️ Review Workspace
+                   Review Workspace
                 </Button>
               </Link>
             </>
@@ -305,7 +305,7 @@ export default function SubmissionDetailPage({
               : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
           }`}
         >
-          📊 Balanced Scorecard & KPIs
+           Balanced Scorecard & KPIs
         </button>
 
         <button
@@ -330,7 +330,7 @@ export default function SubmissionDetailPage({
               : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
           }`}
         >
-          <span>⚖️ CEO / Executive Review</span>
+          <span> CEO / Executive Review</span>
           {reviewFeedback && (
             <Badge
               variant={
@@ -482,7 +482,7 @@ export default function SubmissionDetailPage({
                     isLoading={isGeneratingAi}
                     size="lg"
                   >
-                    ⚡ Generate AI Analysis Now
+                     Generate AI Analysis Now
                   </Button>
                 </div>
               )}
@@ -493,7 +493,7 @@ export default function SubmissionDetailPage({
               <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl">📄</span>
+                    <span className="text-xl"></span>
                     <h2 className="text-base font-bold text-[var(--foreground)]">
                       Executive Summary & Performance Narrative
                     </h2>
@@ -508,7 +508,7 @@ export default function SubmissionDetailPage({
                         onClick={() => setIsEditAiOpen(true)}
                         className="text-xs font-semibold text-[var(--primary)] hover:underline cursor-pointer ml-2"
                       >
-                        ✏️ Edit Narrative
+                         Edit Narrative
                       </button>
                     )}
                   </div>
@@ -563,7 +563,7 @@ export default function SubmissionDetailPage({
               {/* BSC Perspective Insights */}
               <div className="p-8 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-sm space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">🎯</span>
+                  <span className="text-xl"></span>
                   <h2 className="text-base font-bold text-[var(--foreground)]">
                     Balanced Scorecard Perspective Insights
                   </h2>
@@ -591,7 +591,7 @@ export default function SubmissionDetailPage({
               {/* Actionable Recommendations */}
               <div className="p-8 rounded-3xl bg-gradient-to-br from-sky-50/60 to-cyan-50/60 dark:from-sky-950/30 dark:to-cyan-950/30 border border-sky-100 dark:border-sky-900/50 space-y-4">
                 <div className="flex items-center gap-2 text-sky-900 dark:text-sky-200 font-bold text-sm">
-                  <span>💡</span> Strategic Action Recommendations
+                  Strategic Action Recommendations
                 </div>
 
                 <div className="space-y-2.5">
@@ -618,7 +618,7 @@ export default function SubmissionDetailPage({
         <div className="space-y-8 animate-fade-in">
           {!reviewFeedback ? (
             <div className="p-12 rounded-3xl bg-[var(--card)] border border-[var(--border)] text-center space-y-4">
-              <div className="text-4xl">⚖️</div>
+              <div className="text-4xl"></div>
               <div className="font-bold text-base text-[var(--foreground)]">
                 Review Pending
               </div>
@@ -677,7 +677,7 @@ export default function SubmissionDetailPage({
                 {isReviewer && (
                   <Link href={`/review/${submission.id}`}>
                     <Button variant="outline" size="sm">
-                      ✏️ Edit Review
+                       Edit Review
                     </Button>
                   </Link>
                 )}
@@ -739,7 +739,7 @@ export default function SubmissionDetailPage({
                             key={idx}
                             className="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-semibold text-xs border border-sky-100 dark:border-sky-900"
                           >
-                            🎯 {tag}
+                             {tag}
                           </span>
                         ),
                       )}

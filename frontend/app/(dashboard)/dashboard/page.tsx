@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -108,11 +108,6 @@ export default function DashboardPage() {
       {/* Welcome Banner */}
       <div className="rounded-3xl p-8 text-white shadow-xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0d1b2a 0%, #0077b6 55%, #00b4d8 100%)'}}>
         <div className="relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-xs text-xs font-bold uppercase tracking-wider">
-            <span>Role:</span>
-            <span className="text-cyan-200">{user?.role}</span>
-            {user?.department && <span>• {user.department}</span>}
-          </div>
           <h1 className="text-3xl font-black tracking-tight">
             Welcome back, {user?.first_name} {user?.last_name}!
           </h1>
@@ -148,7 +143,7 @@ export default function DashboardPage() {
               </Link>
               <Link href="/performance/upload">
                 <Button variant="outline" size="sm" className="gap-1.5 shadow-sm">
-                  <span>📥</span> Upload Excel
+                  Upload Excel
                 </Button>
               </Link>
             </div>
@@ -447,7 +442,7 @@ export default function DashboardPage() {
             </div>
             <Link href="/review">
               <Button size="sm" className="gap-1.5 shadow-sm">
-                <span>⚖️</span> Open Review Queue ({reviewerData.pendingReviewsCount || 0})
+                Open Review Queue ({reviewerData.pendingReviewsCount || 0})
               </Button>
             </Link>
           </div>
@@ -456,7 +451,7 @@ export default function DashboardPage() {
           {reviewerData.pendingReviewsCount > 0 ? (
             <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-500/30 space-y-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">⏳</span>
+                <span className="text-2xl"></span>
                 <div>
                   <h3 className="font-bold text-base text-amber-900 dark:text-amber-300">
                     {reviewerData.pendingReviewsCount} Submissions Awaiting Your Review
@@ -498,7 +493,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="p-6 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-sm font-semibold flex items-center gap-3">
-              <span className="text-xl">✅</span>
+              <span className="text-xl"></span>
               <span>All submitted reports have been evaluated and approved. No pending reviews in queue.</span>
             </div>
           )}
@@ -563,12 +558,12 @@ export default function DashboardPage() {
             <div className="flex gap-2">
               <Link href="/audit">
                 <Button size="sm" variant="outline" className="gap-1.5 shadow-sm">
-                  <span>📜</span> View Audit Logs
+                  View Audit Logs
                 </Button>
               </Link>
               <Link href="/settings">
                 <Button size="sm" variant="outline" className="gap-1.5 shadow-sm">
-                  <span>⚙️</span> System Config
+                  System Config
                 </Button>
               </Link>
             </div>
@@ -577,7 +572,7 @@ export default function DashboardPage() {
           {/* Unconfirmed Business Rules Alert */}
           {adminData.systemHealth?.hasUnconfirmedConfig && (
             <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3.5">
-              <span className="text-2xl mt-0.5">⚠️</span>
+              <span className="text-2xl mt-0.5"></span>
               <div className="space-y-1">
                 <h4 className="font-bold text-sm text-amber-900 dark:text-amber-300">
                   Unconfirmed Business Rules Notice

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -263,13 +263,13 @@ export default function ComplianceDashboardPage() {
 
                       <td className="px-6 py-4">
                         {row.status === 'APPROVED' && (
-                          <Badge variant="success">✅ Approved</Badge>
+                          <Badge variant="success"> Approved</Badge>
                         )}
                         {row.status === 'SUBMITTED' && (
                           <Badge variant="primary">📋 Submitted</Badge>
                         )}
                         {row.status === 'DRAFT' && (
-                          <Badge variant="warning">⏳ In Progress</Badge>
+                          <Badge variant="warning"> In Progress</Badge>
                         )}
                         {row.status === 'MISSING' && (
                           <Badge variant="danger">❌ Not Submitted</Badge>

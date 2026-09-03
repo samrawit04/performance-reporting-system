@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/auth-context';
@@ -114,7 +114,7 @@ export default function AuditLogsPage() {
       <div className="p-4 rounded-3xl bg-[var(--card)] border border-[var(--border)] shadow-xs space-y-3">
         <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row gap-3">
           <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-            <span className="text-[var(--muted)] text-sm">🔍</span>
+            
             <input
               type="text"
               placeholder="Search by user email, action, entity..."
@@ -186,7 +186,7 @@ export default function AuditLogsPage() {
           </div>
         ) : logs.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <span className="text-4xl">📜</span>
+            <span className="text-4xl"></span>
             <h3 className="font-bold text-base text-[var(--foreground)]">No Audit Records Found</h3>
             <p className="text-xs text-[var(--muted)]">
               No audit logs match the current search filter criteria.

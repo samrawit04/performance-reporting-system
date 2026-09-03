@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -149,7 +149,7 @@ export default function FinalReportsPage() {
             onClick={handleExportCsv}
             className="gap-1.5 shadow-xs"
           >
-            <span>📊</span> Export Summary (CSV)
+            Export Summary (CSV)
           </Button>
           <Button
             variant="outline"
@@ -164,7 +164,7 @@ export default function FinalReportsPage() {
 
       {/* Search and Filters */}
       <div className="flex flex-wrap items-center gap-3 p-3 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-xs">
-        <span className="text-lg text-[var(--muted)] pl-2">🔍</span>
+        
         <input
           type="text"
           placeholder="Search by executive name or reporting period..."
@@ -213,7 +213,7 @@ export default function FinalReportsPage() {
           </div>
         ) : filteredReports.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <span className="text-4xl">📄</span>
+            <span className="text-4xl"></span>
             <h3 className="font-bold text-base text-[var(--foreground)]">No Approved Reports Found</h3>
             <p className="text-xs text-[var(--muted)] max-w-sm mx-auto">
               Executive reports will appear here once submitted performance figures are evaluated and approved by the CEO/COO.
@@ -286,7 +286,7 @@ export default function FinalReportsPage() {
                               </>
                             ) : (
                               <>
-                                <span>⬇️</span> PDF
+                                PDF
                               </>
                             )}
                           </Button>

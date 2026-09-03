@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -113,7 +113,7 @@ export default function PerformanceHistoryPage() {
             <Button size="sm">+ New Entry</Button>
           </Link>
           <Link href="/performance/upload">
-            <Button variant="outline" size="sm">📥 Upload Excel</Button>
+            <Button variant="outline" size="sm"> Upload Excel</Button>
           </Link>
         </div>
       </div>
@@ -200,7 +200,7 @@ export default function PerformanceHistoryPage() {
         </div>
       ) : filteredSubmissions.length === 0 ? (
         <div className="p-12 rounded-3xl bg-[var(--card)] border border-[var(--border)] text-center space-y-3">
-          <div className="text-3xl">📜</div>
+          <div className="text-3xl"></div>
           <div className="font-bold text-sm text-[var(--foreground)]">
             No history records found for this filter
           </div>
@@ -272,7 +272,7 @@ export default function PerformanceHistoryPage() {
                     {sub.status === 'APPROVED' && (
                       <Link href={`/reports`}>
                         <Button size="sm" variant="secondary" className="w-full text-xs">
-                          📄 Download PDF
+                           Download PDF
                         </Button>
                       </Link>
                     )}

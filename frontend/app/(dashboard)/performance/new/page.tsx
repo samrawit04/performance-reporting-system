@@ -178,7 +178,7 @@ export default function NewPerformancePage() {
               size="sm"
               onClick={handlePreFillTemplates}
             >
-              ⚡ Pre-fill from Standard Templates
+               Pre-fill from Standard Templates
             </Button>
           )}
           <Button

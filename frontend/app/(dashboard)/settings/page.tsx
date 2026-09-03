@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/auth-context';
@@ -167,7 +167,7 @@ export default function SettingsPage() {
               : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
           }`}
         >
-          ⚙️ Scoring & Weighting Rules
+           Scoring & Weighting Rules
         </button>
         <button
           onClick={() => setActiveTab('thresholds')}
@@ -177,7 +177,7 @@ export default function SettingsPage() {
               : 'border-transparent text-[var(--muted)] hover:text-[var(--foreground)]'
           }`}
         >
-          🏆 Rating Thresholds
+           Rating Thresholds
         </button>
       </div>
 
@@ -261,7 +261,7 @@ export default function SettingsPage() {
       {activeTab === 'scoring' && (
         <div className="space-y-4">
           <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-200">
-            ⚠️ <strong>Notice on Business Rules:</strong> The client has not confirmed the final weighting formulas. The values below are configurable provisional defaults.
+             <strong>Notice on Business Rules:</strong> The client has not confirmed the final weighting formulas. The values below are configurable provisional defaults.
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -349,7 +349,7 @@ export default function SettingsPage() {
       {activeTab === 'thresholds' && (
         <div className="space-y-4">
           <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-200">
-            ⚠️ <strong>Rating Thresholds:</strong> These bracket ranges determine whether an achievement score is labeled Excellent, Good, Satisfactory, or Needs Improvement.
+             <strong>Rating Thresholds:</strong> These bracket ranges determine whether an achievement score is labeled Excellent, Good, Satisfactory, or Needs Improvement.
           </div>
 
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-sm">

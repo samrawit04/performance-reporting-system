@@ -202,7 +202,7 @@ export default function ReviewQueuePage() {
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-[var(--muted)]">
                     <div className="space-y-3">
-                      <div className="text-3xl">🎉</div>
+                      <div className="text-3xl"></div>
                       <div className="font-semibold text-sm text-[var(--foreground)]">
                         No submissions currently awaiting review
                       </div>

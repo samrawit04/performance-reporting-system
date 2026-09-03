@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -204,7 +204,7 @@ export default function ExcelUploadPage() {
 
         <div className="max-w-md mx-auto space-y-3">
           <div className="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950 text-sky-600 text-3xl flex items-center justify-center mx-auto shadow-inner">
-            📥
+            
           </div>
 
           <div className="font-bold text-sm text-[var(--foreground)]">
