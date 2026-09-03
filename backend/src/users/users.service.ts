@@ -124,11 +124,13 @@ export class UsersService {
 
     const saved = await this.userRepository.save(user);
 
+    // Sanitize: never log the password field in audit trail
+    const { password: _omit, ...safeChanges } = updateUserDto as any;
     this.auditService.log({
       action: 'USER_UPDATED',
       entity: 'User',
       entityId: saved.id,
-      details: { email: saved.email, changes: updateUserDto },
+      details: { email: saved.email, changes: safeChanges },
     });
 
     delete (saved as Partial<User>).password_hash;

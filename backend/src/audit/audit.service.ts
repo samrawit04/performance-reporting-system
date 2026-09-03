@@ -24,6 +24,19 @@ export class AuditService {
     private readonly auditRepository: Repository<AuditLog>,
   ) {}
 
+  /** Remove sensitive fields from audit payloads before persisting */
+  private sanitize(details?: Record<string, any> | null): Record<string, any> | null {
+    if (!details) return null;
+    const SENSITIVE_KEYS = ['password', 'password_hash', 'token', 'access_token', 'secret', 'authorization'];
+    const sanitized = { ...details };
+    for (const key of Object.keys(sanitized)) {
+      if (SENSITIVE_KEYS.some((s) => key.toLowerCase().includes(s))) {
+        sanitized[key] = '[REDACTED]';
+      }
+    }
+    return sanitized;
+  }
+
   async log(params: CreateAuditLogParams): Promise<void> {
     try {
       const auditEntry = this.auditRepository.create({
@@ -33,7 +46,7 @@ export class AuditService {
         action: params.action,
         entity: params.entity,
         entityId: params.entityId || null,
-        details: params.details || null,
+        details: this.sanitize(params.details),
         ipAddress: params.ipAddress || null,
       });
 
