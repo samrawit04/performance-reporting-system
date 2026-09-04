@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { AggregationService } from './aggregation.service';
+import { AiService } from '../ai/ai.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -8,7 +9,10 @@ import { Role } from '../common/constants/enums';
 @Controller('aggregation')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AggregationController {
-  constructor(private readonly aggregationService: AggregationService) {}
+  constructor(
+    private readonly aggregationService: AggregationService,
+    private readonly aiService: AiService,
+  ) {}
 
   /** Manager fetches their own aggregation */
   @Get('me')
@@ -38,5 +42,14 @@ export class AggregationController {
   async getOrgOverview(@Query('year') year?: string) {
     const targetYear = year ? parseInt(year, 10) : new Date().getFullYear();
     return this.aggregationService.getOrgOverview(targetYear);
+  }
+
+  /** CEO / Admin company-wide AI macro strategic analysis */
+  @Get('ai-macro-summary')
+  @Roles(Role.REVIEWER, Role.ADMIN)
+  async getAiMacroSummary(@Query('year') year?: string) {
+    const targetYear = year ? parseInt(year, 10) : new Date().getFullYear();
+    const overview = await this.aggregationService.getOrgOverview(targetYear);
+    return this.aiService.generateCompanyMacroAnalysis(overview);
   }
 }

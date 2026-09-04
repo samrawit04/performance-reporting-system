@@ -135,6 +135,68 @@ export class AiService {
   }
 
   /**
+   * Generates a high-level Executive Macro Synthesis across all managers/departments for the CEO.
+   */
+  async generateCompanyMacroAnalysis(overviewData: any): Promise<any> {
+    const apiKey = this.configService.get<string>('GEMINI_API_KEY');
+    let modelUsed = 'gemini-2.5-flash';
+
+    if (apiKey && apiKey !== 'your-gemini-api-key' && apiKey.trim().length > 0) {
+      try {
+        this.logger.log(`Calling Gemini API (${modelUsed}) for Company Macro Synthesis...`);
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: modelUsed,
+          systemInstruction: this.promptService.buildCompanyMacroSystemPrompt(),
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+          },
+        });
+
+        const userPrompt = this.promptService.buildCompanyMacroUserPrompt(overviewData);
+        const result = await model.generateContent(userPrompt);
+        const responseText = result.response.text();
+        const parsed = JSON.parse(responseText);
+        return { ...parsed, model_used: modelUsed };
+      } catch (err: any) {
+        this.logger.warn(`Gemini API call failed for Macro Analysis (${err.message}), using fallback.`);
+      }
+    }
+
+    // Fallback company macro analysis
+    const companyScore = overviewData.companyAvgScore ?? 78.5;
+    const rating = overviewData.companyRating ?? 'Satisfactory';
+    const managerCount = overviewData.managers?.length || 0;
+    const topManager = overviewData.managers?.[0]?.name || 'Top Manager';
+
+    return {
+      executive_summary: `Company-wide performance for ${overviewData.year} stands at an overall score of ${companyScore}% (${rating}) across ${managerCount} active departmental units. Strategic execution shows strong cross-functional engagement, with top department leadership led by ${topManager}. Key organizational efforts continue to drive progress across primary BSC objectives.`,
+      company_strengths: [
+        `Strong operational leadership led by top performing units achieving ratings up to ${overviewData.managers?.[0]?.overallRating || 'Excellent'}.`,
+        `High reporting compliance with ${overviewData.submissionStats?.approved || 0} approved executive evaluations logged.`,
+        `Balanced progress across financial and customer stakeholder perspectives.`,
+      ],
+      systemic_risks: [
+        `Performance variance between highest and lowest performing departments warrants executive resource reallocation.`,
+        `Operational process bottlenecks require targeted cross-departmental automation.`,
+      ],
+      perspective_breakdown: {
+        FINANCIAL: `Financial perspective achieved a company average of ${overviewData.companyPerspectiveScores?.FINANCIAL || companyScore}%, indicating steady budget control.`,
+        CUSTOMER: `Customer perspective scored ${overviewData.companyPerspectiveScores?.CUSTOMER || companyScore}%, reflecting stable retention and satisfaction rates.`,
+        INTERNAL_PROCESS: `Internal Process efficiency averaged ${overviewData.companyPerspectiveScores?.INTERNAL_PROCESS || companyScore}%, highlighting areas for workflow optimization.`,
+        LEARNING_GROWTH: `Organizational Growth perspective recorded ${overviewData.companyPerspectiveScores?.LEARNING_GROWTH || companyScore}%, demonstrating commitment to skill development.`,
+      },
+      ceo_action_items: [
+        `Conduct Q3/Q4 executive alignment session with lower-scoring department managers.`,
+        `Prioritize capital expenditure toward internal process automation and digital tools.`,
+        `Establish cross-departmental KPI sharing to replicate top-performing department strategies.`,
+      ],
+      model_used: 'rule-based-macro-advisor',
+    };
+  }
+
+  /**
    * Generates intelligent, deterministic executive narrative from real scores
    * when Gemini API key is not supplied or during offline development.
    */

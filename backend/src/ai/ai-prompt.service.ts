@@ -68,4 +68,57 @@ DO NOT include markdown code fences like \`\`\`json in your response. Return ONL
 
     return prompt;
   }
+
+  buildCompanyMacroSystemPrompt(): string {
+    return `You are a Chief Strategy Officer and Corporate Performance Management Expert advising the CEO.
+Your task is to synthesize company-wide performance metrics across all managers and departments into a high-level Executive Macro Strategic Analysis.
+
+You MUST reply with ONLY a valid, parseable JSON object matching this exact schema:
+{
+  "executive_summary": "A 2-3 paragraph macro executive synthesis of overall company performance, cross-departmental synergy, and overall health for the CEO.",
+  "company_strengths": [
+    "Key organizational strength 1 across departments",
+    "Key organizational strength 2 across departments"
+  ],
+  "systemic_risks": [
+    "Systemic bottleneck or operational risk 1",
+    "Systemic bottleneck or operational risk 2"
+  ],
+  "perspective_breakdown": {
+    "FINANCIAL": "1-2 sentences summarizing corporate financial performance.",
+    "CUSTOMER": "1-2 sentences summarizing stakeholder and customer satisfaction.",
+    "INTERNAL_PROCESS": "1-2 sentences summarizing operational execution across departments.",
+    "LEARNING_GROWTH": "1-2 sentences summarizing talent development and innovation."
+  },
+  "ceo_action_items": [
+    "Strategic priority 1 for the CEO and leadership team",
+    "Strategic priority 2 for the CEO and leadership team",
+    "Strategic priority 3 for the CEO and leadership team"
+  ]
+}
+
+DO NOT include markdown code fences like \`\`\`json in your response. Return ONLY raw JSON.`;
+  }
+
+  buildCompanyMacroUserPrompt(overviewData: any): string {
+    let prompt = `Company Performance Data (${overviewData.year}):\n\n`;
+    prompt += `**Overall Company Average Score:** ${overviewData.companyAvgScore ?? 'N/A'}% (${overviewData.companyRating ?? 'N/A'})\n`;
+    prompt += `**Total Active Managers:** ${overviewData.managers?.length || 0}\n`;
+    prompt += `**Total Submissions Logged:** ${overviewData.submissionStats?.total || 0} (${overviewData.submissionStats?.approved || 0} Approved)\n\n`;
+
+    prompt += `### Company-Wide Perspective Averages:\n`;
+    if (overviewData.companyPerspectiveScores) {
+      Object.entries(overviewData.companyPerspectiveScores).forEach(([perspective, score]) => {
+        prompt += `- **${perspective}:** ${score}%\n`;
+      });
+    }
+
+    prompt += `\n### Department Leaderboard Breakdown:\n`;
+    (overviewData.managers || []).forEach((m: any, idx: number) => {
+      prompt += `${idx + 1}. **${m.name}** (${m.department || 'General'}): ${m.yearlyAvgScore ?? 'N/A'}% — Rating: ${m.overallRating || 'N/A'} (Submissions: ${m.submissionCount})\n`;
+    });
+
+    prompt += `\nPlease generate the company-wide executive macro analysis in raw JSON format as specified.`;
+    return prompt;
+  }
 }

@@ -440,11 +440,18 @@ export default function DashboardPage() {
                 Review executive scorecards, AI narrative insights, and provide final advice
               </p>
             </div>
-            <Link href="/review">
-              <Button size="sm" className="gap-1.5 shadow-sm">
-                Open Review Queue ({reviewerData.pendingReviewsCount || 0})
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/company-overview">
+                <Button variant="outline" size="sm" className="gap-1.5 shadow-sm text-[#0077b6] border-[#0077b6]/30">
+                  Company Overview
+                </Button>
+              </Link>
+              <Link href="/review">
+                <Button size="sm" className="gap-1.5 shadow-sm">
+                  Open Review Queue ({reviewerData.pendingReviewsCount || 0})
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Pending Reviews Cards */}

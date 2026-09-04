@@ -44,6 +44,11 @@ const navItems: NavItem[] = [
     roles: ['REVIEWER'],
   },
   {
+    label: 'Company Overview',
+    href: '/company-overview',
+    roles: ['REVIEWER', 'ADMIN'],
+  },
+  {
     label: 'Final Reports',
     href: '/reports',
     roles: ['MANAGER', 'REVIEWER'],

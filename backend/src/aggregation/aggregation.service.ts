@@ -31,6 +31,16 @@ export interface ManagerAggregation {
 
 export interface OrgOverview {
   year: number;
+  companyAvgScore: number | null;
+  companyRating: string | null;
+  companyPerspectiveScores: Record<string, number>;
+  submissionStats: {
+    total: number;
+    approved: number;
+    underReview: number;
+    returned: number;
+    calculated: number;
+  };
   managers: {
     userId: string;
     name: string;
@@ -38,6 +48,7 @@ export interface OrgOverview {
     yearlyAvgScore: number | null;
     overallRating: string | null;
     submissionCount: number;
+    perspectiveScores: Record<string, number>;
   }[];
 }
 
@@ -189,7 +200,7 @@ export class AggregationService {
   async getOrgOverview(year: number): Promise<OrgOverview> {
     const allSubmissions = await this.submissionRepo.find({
       where: { period_type: PeriodType.MONTHLY },
-      relations: ['executive'],
+      relations: ['executive', 'perspective_scores'],
       order: { created_at: 'ASC' },
     });
 
@@ -199,6 +210,19 @@ export class AggregationService {
       return y === year;
     });
 
+    // Submission stats
+    const submissionStats = {
+      total: yearSubs.length,
+      approved: yearSubs.filter((s) => s.status === SubmissionStatus.APPROVED).length,
+      underReview: yearSubs.filter(
+        (s) =>
+          s.status === SubmissionStatus.UNDER_REVIEW ||
+          s.status === SubmissionStatus.AI_ANALYZED,
+      ).length,
+      returned: yearSubs.filter((s) => s.status === SubmissionStatus.DRAFT).length,
+      calculated: yearSubs.filter((s) => s.status === SubmissionStatus.CALCULATED).length,
+    };
+
     // Group by executive
     const execMap: Record<string, PerformanceSubmission[]> = {};
     for (const s of yearSubs) {
@@ -206,6 +230,8 @@ export class AggregationService {
       if (!execMap[key]) execMap[key] = [];
       execMap[key].push(s);
     }
+
+    const perspectives = Object.values(BscPerspective);
 
     const managers = Object.entries(execMap).map(([userId, subs]) => {
       const exec = subs[0]?.executive;
@@ -222,13 +248,30 @@ export class AggregationService {
             )
           : null;
 
-      // Determine rating label
       let overallRating: string | null = null;
       if (yearlyAvgScore !== null) {
         if (yearlyAvgScore >= 90) overallRating = 'Excellent';
         else if (yearlyAvgScore >= 75) overallRating = 'Good';
         else if (yearlyAvgScore >= 60) overallRating = 'Satisfactory';
         else overallRating = 'Needs Improvement';
+      }
+
+      // Calculate perspective averages for this manager
+      const managerPerspectiveScores: Record<string, number> = {};
+      for (const p of perspectives) {
+        const pScores: number[] = [];
+        for (const sub of subs) {
+          for (const ps of sub.perspective_scores || []) {
+            if (ps.perspective === p && ps.average_score !== undefined && ps.average_score !== null) {
+              pScores.push(Number(ps.average_score));
+            }
+          }
+        }
+        if (pScores.length > 0) {
+          managerPerspectiveScores[p] = Number(
+            (pScores.reduce((sum, val) => sum + val, 0) / pScores.length).toFixed(2),
+          );
+        }
       }
 
       return {
@@ -238,9 +281,53 @@ export class AggregationService {
         yearlyAvgScore,
         overallRating,
         submissionCount: subs.length,
+        perspectiveScores: managerPerspectiveScores,
       };
     });
 
-    return { year, managers };
+    // Sort managers by yearlyAvgScore descending
+    managers.sort((a, b) => (b.yearlyAvgScore || 0) - (a.yearlyAvgScore || 0));
+
+    // Company Overall Average Score
+    const scoredManagers = managers.filter((m) => m.yearlyAvgScore !== null);
+    const companyAvgScore =
+      scoredManagers.length > 0
+        ? Number(
+            (
+              scoredManagers.reduce((sum, m) => sum + (m.yearlyAvgScore || 0), 0) /
+              scoredManagers.length
+            ).toFixed(2),
+          )
+        : null;
+
+    let companyRating: string | null = null;
+    if (companyAvgScore !== null) {
+      if (companyAvgScore >= 90) companyRating = 'Excellent';
+      else if (companyAvgScore >= 75) companyRating = 'Good';
+      else if (companyAvgScore >= 60) companyRating = 'Satisfactory';
+      else companyRating = 'Needs Improvement';
+    }
+
+    // Company Perspective Scores
+    const companyPerspectiveScores: Record<string, number> = {};
+    for (const p of perspectives) {
+      const pScores = managers
+        .map((m) => m.perspectiveScores[p])
+        .filter((v) => v !== undefined && v !== null);
+      if (pScores.length > 0) {
+        companyPerspectiveScores[p] = Number(
+          (pScores.reduce((sum, val) => sum + val, 0) / pScores.length).toFixed(2),
+        );
+      }
+    }
+
+    return {
+      year,
+      companyAvgScore,
+      companyRating,
+      companyPerspectiveScores,
+      submissionStats,
+      managers,
+    };
   }
 }
