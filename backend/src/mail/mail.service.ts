@@ -55,13 +55,13 @@ export class MailService {
       magicLinkUrl,
     } = params;
 
-    const subject = `📋 Performance Report Ready for Review — ${submissionLabel} (${managerName})`;
+    const subject = `Performance Report Ready for Review — ${submissionLabel} (${managerName})`;
 
     const magicButtonHtml = magicLinkUrl
       ? `<tr>
            <td style="padding:28px 40px;text-align:center;">
              <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#4338CA 0%,#6366F1 100%);color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:15px 36px;border-radius:10px;box-shadow:0 4px 16px rgba(99,102,241,0.45);">
-               ⚖️ Open Review Workspace &rarr;
+               Open Review Workspace &rarr;
              </a>
              <p style="margin:10px 0 0;font-size:11px;color:#9CA3AF;">Secure 1-click review access link valid for 7 days</p>
            </td>
@@ -175,8 +175,8 @@ export class MailService {
   ): Promise<void> {
     const isApproved = action === 'APPROVED';
     const subject = isApproved
-      ? `✅ Performance Report Approved — ${submissionLabel}`
-      : `↩️ Performance Report Returned for Revision — ${submissionLabel}`;
+      ? `Performance Report Approved — ${submissionLabel}`
+      : `Performance Report Returned for Revision — ${submissionLabel}`;
 
     const textContent = `Hello ${recipientName},\n\nYour performance submission for "${submissionLabel}" has been ${
       isApproved ? 'APPROVED by executive review' : 'RETURNED for adjustments'
@@ -234,7 +234,7 @@ export class MailService {
       magicLinkUrl,
     } = params;
 
-    const subject = `✅ Performance Report Officially Approved — ${submissionLabel}`;
+    const subject = `Performance Report Officially Approved — ${submissionLabel}`;
 
     const focusAreasHtml =
       recommendedFocusAreas.length > 0
@@ -250,7 +250,7 @@ export class MailService {
       ? `<tr>
            <td style="padding:24px 40px 0;text-align:center;">
              <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#4338CA 0%,#6366F1 100%);color:#FFFFFF;text-decoration:none;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;box-shadow:0 4px 14px rgba(99,102,241,0.4);">
-               🔗 View Report &amp; Feedback in Portal &rarr;
+               View Report &amp; Feedback in Portal &rarr;
              </a>
              <p style="margin:8px 0 0;font-size:11px;color:#9CA3AF;">Secure 1-click access link valid for 7 days</p>
            </td>
@@ -344,8 +344,7 @@ export class MailService {
               <table cellpadding="0" cellspacing="0" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:16px 20px;width:100%;">
                 <tr>
                   <td>
-                    <span style="font-size:18px;">📄</span>
-                    <span style="margin-left:10px;font-size:13px;font-weight:600;color:#14532D;">Official Performance Report PDF is attached to this email.</span>
+                    <span style="font-size:13px;font-weight:600;color:#14532D;">Official Performance Report PDF is attached to this email.</span>
                     <p style="margin:6px 0 0;font-size:12px;color:#166534;">The attached PDF is the authorised copy of your Balanced Scorecard evaluation, including all KPI details and CEO sign-off.</p>
                   </td>
                 </tr>
@@ -412,7 +411,7 @@ export class MailService {
     resetUrl: string;
   }): Promise<void> {
     const { recipientEmail, recipientName, resetUrl } = params;
-    const subject = `🔑 Password Reset Request — Executive Performance System`;
+    const subject = `Password Reset Request — Executive Performance System`;
 
     const htmlContent = `
 <!DOCTYPE html>
