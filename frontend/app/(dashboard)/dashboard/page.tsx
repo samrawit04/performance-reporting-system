@@ -103,13 +103,20 @@ export default function DashboardPage() {
     );
   }
 
+  const getRoleDisplayName = (role?: string) => {
+    if (role === 'REVIEWER') return 'CEO';
+    if (role === 'MANAGER') return 'Manager';
+    if (role === 'ADMIN') return 'Admin';
+    return role || 'User';
+  };
+
   return (
     <div className="w-full space-y-8 animate-fade-in pb-12">
       {/* Welcome Banner */}
       <div className="rounded-3xl p-8 text-white shadow-xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0d1b2a 0%, #0077b6 55%, #00b4d8 100%)'}}>
         <div className="relative z-10 space-y-3">
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, {user?.first_name} {user?.last_name}!
+            Welcome {getRoleDisplayName(user?.role)}!
           </h1>
           <p className="text-cyan-100 max-w-2xl text-sm leading-relaxed">
             Balanced Scorecard Executive Performance Management — evaluate achievements across Financial, Customer, Internal Process, and Learning & Growth perspectives.
