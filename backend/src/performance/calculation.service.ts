@@ -14,6 +14,18 @@ export interface CalculationResult {
   overallRating: string;
 }
 
+/** Simple in-memory cache entry */
+interface CacheEntry<T> {
+  data: T;
+  expiresAt: number;
+}
+
+/**
+ * TTL for the scoring config / rating thresholds cache in milliseconds.
+ * Config is rarely changed by admins, so 5 minutes is safe.
+ */
+const CONFIG_CACHE_TTL_MS = 5 * 60 * 1000;
+
 @Injectable()
 export class CalculationService {
   constructor(
@@ -22,6 +34,46 @@ export class CalculationService {
     @InjectRepository(RatingThreshold)
     private readonly ratingThresholdRepo: Repository<RatingThreshold>,
   ) {}
+
+  // ─── In-memory caches ────────────────────────────────────────────────────────
+  private scoringConfigCache: CacheEntry<ScoringConfig[]> | null = null;
+  private ratingThresholdCache: CacheEntry<RatingThreshold[]> | null = null;
+
+  /**
+   * Returns scoring configs from cache, refreshing if expired.
+   * Avoids a DB round-trip on every submission calculation.
+   */
+  private async getScoringConfigs(): Promise<ScoringConfig[]> {
+    const now = Date.now();
+    if (this.scoringConfigCache && now < this.scoringConfigCache.expiresAt) {
+      return this.scoringConfigCache.data;
+    }
+    const data = await this.scoringConfigRepo.find();
+    this.scoringConfigCache = { data, expiresAt: now + CONFIG_CACHE_TTL_MS };
+    return data;
+  }
+
+  /**
+   * Returns rating thresholds from cache, refreshing if expired.
+   */
+  private async getRatingThresholds(): Promise<RatingThreshold[]> {
+    const now = Date.now();
+    if (this.ratingThresholdCache && now < this.ratingThresholdCache.expiresAt) {
+      return this.ratingThresholdCache.data;
+    }
+    const data = await this.ratingThresholdRepo.find({ order: { min_score: 'DESC' } });
+    this.ratingThresholdCache = { data, expiresAt: now + CONFIG_CACHE_TTL_MS };
+    return data;
+  }
+
+  /**
+   * Call this whenever an admin updates scoring config or rating thresholds
+   * so the cache is invalidated immediately.
+   */
+  invalidateConfigCache(): void {
+    this.scoringConfigCache = null;
+    this.ratingThresholdCache = null;
+  }
 
   async calculateSubmission(
     entries: PerformanceEntry[],
@@ -35,11 +87,11 @@ export class CalculationService {
       };
     }
 
-    // 1. Fetch dynamic scoring configs & thresholds from database
-    const scoringConfigs = await this.scoringConfigRepo.find();
-    const thresholds = await this.ratingThresholdRepo.find({
-      order: { min_score: 'DESC' },
-    });
+    // 1. Fetch dynamic scoring configs & thresholds (served from cache when available)
+    const [scoringConfigs, thresholds] = await Promise.all([
+      this.getScoringConfigs(),
+      this.getRatingThresholds(),
+    ]);
 
     const configMap: Record<string, any> = {};
     for (const c of scoringConfigs) {

@@ -189,10 +189,8 @@ export class PerformanceService {
       submission.entries,
     );
 
-    // Save calculated entry fields
-    for (const calculatedEntry of result.entries) {
-      await this.entryRepo.save(calculatedEntry);
-    }
+    // Save all calculated entries in a single batch call (avoids N+1 sequential writes)
+    await this.entryRepo.save(result.entries);
 
     // Replace BSC perspective scores with explicit submission_id
     await this.bscScoreRepo.delete({ submission_id: submissionId });

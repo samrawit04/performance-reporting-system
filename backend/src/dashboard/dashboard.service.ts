@@ -120,22 +120,20 @@ export class DashboardService {
   }
 
   async getReviewerDashboard() {
-    // 1. Pending reviews (UNDER_REVIEW or AI_ANALYZED or CALCULATED)
-    const pendingSubmissions = await this.submissionRepo.find({
-      where: [
-        { status: SubmissionStatus.UNDER_REVIEW },
-        { status: SubmissionStatus.AI_ANALYZED },
-        { status: SubmissionStatus.CALCULATED },
-      ],
+    // Single query that loads all submissions with relations.
+    // We derive pending, statusCounts, approved, and ratingDistribution from this
+    // one result set — eliminating the previous double full-table scan.
+    const allSubmissions = await this.submissionRepo.find({
       relations: ['executive', 'submitter', 'perspective_scores'],
       order: { created_at: 'ASC' },
     });
 
-    // 2. All submissions breakdown by status
-    const allSubmissions = await this.submissionRepo.find({
-      relations: ['executive', 'perspective_scores'],
-      order: { created_at: 'DESC' },
-    });
+    // Pending reviews derived from the single query result
+    const pendingSubmissions = allSubmissions.filter((s) =>
+      s.status === SubmissionStatus.UNDER_REVIEW ||
+      s.status === SubmissionStatus.AI_ANALYZED ||
+      s.status === SubmissionStatus.CALCULATED,
+    );
 
     const statusCounts = {
       draft: allSubmissions.filter((s) => s.status === SubmissionStatus.DRAFT).length,
@@ -152,7 +150,7 @@ export class DashboardService {
       total: allSubmissions.length,
     };
 
-    // 3. Organization average score from approved evaluations
+    // Organization average score from approved evaluations
     const approvedSubmissions = allSubmissions.filter(
       (s) => s.status === SubmissionStatus.APPROVED && s.overall_score !== null,
     );
@@ -166,7 +164,7 @@ export class DashboardService {
         )
       : null;
 
-    // 4. Rating distribution of approved/calculated submissions
+    // Rating distribution
     const ratingDistribution: Record<string, number> = {};
     allSubmissions.forEach((s) => {
       if (s.overall_rating) {
@@ -204,8 +202,17 @@ export class DashboardService {
   }
 
   async getAdminDashboard() {
-    // 1. Platform counts
-    const [totalUsers, totalKpis, totalSubmissions, pendingReviewsCount] = await Promise.all([
+    // All 7 DB calls run in parallel — no sequential waiting.
+    const [
+      totalUsers,
+      totalKpis,
+      totalSubmissions,
+      pendingReviewsCount,
+      users,
+      scoringConfigs,
+      ratingThresholds,
+      recentAuditLogs,
+    ] = await Promise.all([
       this.userRepo.count(),
       this.kpiRepo.count({ where: { is_active: true } }),
       this.submissionRepo.count(),
@@ -216,29 +223,21 @@ export class DashboardService {
           { status: SubmissionStatus.CALCULATED },
         ],
       }),
+      this.userRepo.find(),
+      this.configRepo.find(),
+      this.ratingThresholdRepo.find(),
+      this.auditRepo.find({ order: { createdAt: 'DESC' }, take: 6 }),
     ]);
 
-    // 2. Users by role
-    const users = await this.userRepo.find();
     const usersByRole = {
       admin: users.filter((u) => u.role === 'ADMIN').length,
       manager: users.filter((u) => u.role === 'MANAGER').length,
       reviewer: users.filter((u) => u.role === 'REVIEWER').length,
     };
 
-    // 3. System Config Confirmation Status
-    const scoringConfigs = await this.configRepo.find();
-    const ratingThresholds = await this.ratingThresholdRepo.find();
-
     const hasUnconfirmedConfig =
       scoringConfigs.some((c) => !c.is_confirmed) ||
       ratingThresholds.some((r) => !r.is_confirmed);
-
-    // 4. Recent Audit Logs
-    const recentAuditLogs = await this.auditRepo.find({
-      order: { createdAt: 'DESC' },
-      take: 6,
-    });
 
     return {
       platformStats: {

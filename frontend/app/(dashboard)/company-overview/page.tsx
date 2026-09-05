@@ -34,9 +34,11 @@ export default function CompanyOverviewPage() {
   };
 
   const handleGenerateAiMacroSummary = async () => {
+    if (!orgData) return;
     setAiLoading(true);
     try {
-      const summary = await api.get<any>(`/aggregation/ai-macro-summary?year=${year}`);
+      // POST the already-loaded orgData to avoid a full DB re-scan on the server.
+      const summary = await api.post<any>(`/aggregation/ai-macro-summary`, orgData);
       setAiMacroSummary(summary);
     } catch (err: any) {
       alert('Failed to generate AI Macro Summary: ' + (err.message || 'Error occurred'));

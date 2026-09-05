@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { AggregationService } from './aggregation.service';
 import { AiService } from '../ai/ai.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -44,12 +44,22 @@ export class AggregationController {
     return this.aggregationService.getOrgOverview(targetYear);
   }
 
-  /** CEO / Admin company-wide AI macro strategic analysis */
+  /** CEO / Admin company-wide AI macro strategic analysis (GET version — re-fetches org data) */
   @Get('ai-macro-summary')
   @Roles(Role.REVIEWER, Role.ADMIN)
   async getAiMacroSummary(@Query('year') year?: string) {
     const targetYear = year ? parseInt(year, 10) : new Date().getFullYear();
     const overview = await this.aggregationService.getOrgOverview(targetYear);
     return this.aiService.generateCompanyMacroAnalysis(overview);
+  }
+
+  /**
+   * POST version — frontend sends its already-loaded orgData in the request body.
+   * This avoids a full DB re-scan on every "Generate AI Summary" button click.
+   */
+  @Post('ai-macro-summary')
+  @Roles(Role.REVIEWER, Role.ADMIN)
+  async postAiMacroSummary(@Body() overviewData: any) {
+    return this.aiService.generateCompanyMacroAnalysis(overviewData);
   }
 }

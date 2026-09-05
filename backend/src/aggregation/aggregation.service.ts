@@ -80,36 +80,28 @@ export class AggregationService {
     return 'Q4';
   }
 
-  private extractYear(periodLabel: string): number | null {
-    const match = periodLabel.match(/\d{4}/);
-    return match ? parseInt(match[0], 10) : null;
-  }
-
   async getManagerAggregation(
     userId: string,
     year: number,
   ): Promise<ManagerAggregation> {
-    const submissions = await this.submissionRepo.find({
-      where: [
-        { submitted_by: userId, period_type: PeriodType.MONTHLY },
-        { executive_id: userId, period_type: PeriodType.MONTHLY },
-      ],
-      relations: ['executive', 'perspective_scores'],
-      order: { created_at: 'ASC' },
-    });
-
-    // Filter to requested year
-    const yearSubmissions = submissions.filter((s) => {
-      const y = this.extractYear(s.period_label);
-      return y === year;
-    });
+    // Push year filter into SQL using LIKE on period_label (e.g. "2026")
+    // This avoids loading all-time submissions into memory just to filter in JS.
+    const submissions = await this.submissionRepo
+      .createQueryBuilder('sub')
+      .leftJoinAndSelect('sub.executive', 'executive')
+      .leftJoinAndSelect('sub.perspective_scores', 'perspective_scores')
+      .where('(sub.submitted_by = :userId OR sub.executive_id = :userId)', { userId })
+      .andWhere('sub.period_type = :periodType', { periodType: PeriodType.MONTHLY })
+      .andWhere('sub.period_label LIKE :yearPattern', { yearPattern: `%${year}%` })
+      .orderBy('sub.created_at', 'ASC')
+      .getMany();
 
     const executiveName = submissions[0]?.executive
       ? `${submissions[0].executive.first_name} ${submissions[0].executive.last_name}`
       : 'Unknown';
 
     // Build monthly summaries
-    const monthly: PeriodSummary[] = yearSubmissions.map((s) => {
+    const monthly: PeriodSummary[] = submissions.map((s) => {
       const perspectiveScores: Record<string, number> = {};
       for (const ps of s.perspective_scores || []) {
         perspectiveScores[ps.perspective] = Number(ps.average_score);
@@ -198,17 +190,15 @@ export class AggregationService {
   }
 
   async getOrgOverview(year: number): Promise<OrgOverview> {
-    const allSubmissions = await this.submissionRepo.find({
-      where: { period_type: PeriodType.MONTHLY },
-      relations: ['executive', 'perspective_scores'],
-      order: { created_at: 'ASC' },
-    });
-
-    // Filter by year
-    const yearSubs = allSubmissions.filter((s) => {
-      const y = this.extractYear(s.period_label);
-      return y === year;
-    });
+    // Push year filter into SQL — avoids loading all historical records into memory.
+    const yearSubs = await this.submissionRepo
+      .createQueryBuilder('sub')
+      .leftJoinAndSelect('sub.executive', 'executive')
+      .leftJoinAndSelect('sub.perspective_scores', 'perspective_scores')
+      .where('sub.period_type = :periodType', { periodType: PeriodType.MONTHLY })
+      .andWhere('sub.period_label LIKE :yearPattern', { yearPattern: `%${year}%` })
+      .orderBy('sub.created_at', 'ASC')
+      .getMany();
 
     // Submission stats
     const submissionStats = {
