@@ -1,40 +1,30 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '../../../lib/api';
-import { PerformanceSubmission, SubmissionStatus, PeriodType } from '../../../lib/types';
+import { SubmissionStatus, PeriodType } from '../../../lib/types';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../context/auth-context';
+import { useSubmissions } from '../../../lib/hooks/useSubmissions';
 
 export default function PerformanceHistoryPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [submissions, setSubmissions] = useState<PerformanceSubmission[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState<'ALL' | PeriodType>('ALL');
 
-  useEffect(() => {
+  const { data: submissions = [], isLoading } = useSubmissions(
+    undefined,
+    !!user && user.role === 'MANAGER',
+  );
+
+  React.useEffect(() => {
     if (user && user.role !== 'MANAGER') {
       router.replace('/dashboard');
-      return;
     }
-
-    const fetchHistory = async () => {
-      try {
-        setIsLoading(true);
-        const data = await api.get<PerformanceSubmission[]>('/submissions');
-        setSubmissions(data);
-      } catch (err) {
-        console.error('Failed to load performance history:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchHistory();
   }, [user, router]);
+
 
   const getStatusBadge = (status: SubmissionStatus) => {
     switch (status) {

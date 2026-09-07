@@ -1,23 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../context/auth-context';
-import { api } from '../../../lib/api';
 import { User, UserRole } from '../../../lib/types';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
 import { Modal } from '../../../components/ui/Modal';
+import { useUsers, useCreateUser, useDeleteUser, useUpdateUser } from '../../../lib/hooks/useUsers';
 
 export default function UsersPage() {
   const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const { data: users = [], isLoading } = useUsers(undefined, !!currentUser && currentUser.role === 'ADMIN');
+  const createUserMutation = useCreateUser();
+  const deleteUserMutation = useDeleteUser();
+  const updateUserMutation = useUpdateUser();
 
   // New user form state
   const [email, setEmail] = useState('');
@@ -28,50 +30,36 @@ export default function UsersPage() {
   const [role, setRole] = useState<UserRole>('MANAGER');
   const [department, setDepartment] = useState('');
 
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
-      const data = await api.get<User[]>('/users');
-      setUsers(data);
-    } catch (err: any) {
-      console.error('Failed to load users:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const formLoading = createUserMutation.isPending;
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+    setFirstName('');
+    setLastName('');
+    setRole('MANAGER');
+    setDepartment('');
+  };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
-    setFormLoading(true);
     try {
-      await api.post('/users', {
+      await createUserMutation.mutateAsync({
         email,
         password,
         first_name: firstName,
         last_name: lastName,
         role,
         department: department || undefined,
-      });
+      } as any);
       setIsModalOpen(false);
-      // Reset form
-      setEmail('');
-      setPassword('');
-      setFirstName('');
-      setLastName('');
-      setRole('MANAGER');
-      setDepartment('');
-      await fetchUsers();
+      resetForm();
     } catch (err: any) {
       setFormError(err.message || 'Failed to create user');
-    } finally {
-      setFormLoading(false);
     }
   };
+
 
   const handleToggleActive = async (userToToggle: User) => {
     if (userToToggle.id === currentUser?.id) {
@@ -79,12 +67,15 @@ export default function UsersPage() {
       return;
     }
     try {
-      await api.patch(`/users/${userToToggle.id}/toggle-active`);
-      await fetchUsers();
+      await updateUserMutation.mutateAsync({
+        id: userToToggle.id,
+        data: { is_active: !userToToggle.is_active },
+      });
     } catch (err: any) {
       alert(err.message || 'Failed to update user status');
     }
   };
+
 
   const filteredUsers = users.filter((u) => {
     const q = search.toLowerCase();

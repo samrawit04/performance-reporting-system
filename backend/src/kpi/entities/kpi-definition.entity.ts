@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { BscPerspective, KpiDirection } from '../../common/constants/enums';
 
@@ -12,6 +13,7 @@ export class KpiDefinition {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: BscPerspective,
@@ -40,6 +42,7 @@ export class KpiDefinition {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 1.0 })
   weight: number;
 
+  @Index()
   @Column({ default: true })
   is_active: boolean;
 

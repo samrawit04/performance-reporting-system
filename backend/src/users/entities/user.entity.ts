@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { Role } from '../../common/constants/enums';
 
@@ -24,6 +25,7 @@ export class User {
   @Column()
   last_name: string;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: Role,
@@ -31,6 +33,7 @@ export class User {
   })
   role: Role;
 
+  @Index()
   @Column({ nullable: true })
   department?: string;
 

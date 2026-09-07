@@ -1,63 +1,45 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../../context/auth-context';
-import { api } from '../../../lib/api';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { RadarChart, RadarDataPoint } from '../../../components/charts/RadarChart';
 import { TrendChart, TrendDataPoint } from '../../../components/charts/TrendChart';
 import { DistributionBar } from '../../../components/charts/DistributionBar';
+import {
+  useManagerDashboard,
+  useReviewerDashboard,
+  useAdminDashboard,
+  useAggregationMe,
+  useAggregationOverview,
+} from '../../../lib/hooks/useDashboard';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [managerData, setManagerData] = useState<any>(null);
-  const [reviewerData, setReviewerData] = useState<any>(null);
-  const [adminData, setAdminData] = useState<any>(null);
-  const [aggregationData, setAggregationData] = useState<any>(null);
-  const [orgAggregationData, setOrgAggregationData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [user]);
+  const isManager = user?.role === 'MANAGER';
+  const isReviewer = user?.role === 'REVIEWER';
+  const isAdmin = user?.role === 'ADMIN';
 
-  const fetchDashboardData = async () => {
-    if (!user) return;
-    setLoading(true);
-    setError(null);
-    try {
-      if (user.role === 'MANAGER') {
-        const [res, agg] = await Promise.all([
-          api.get<any>('/dashboard/manager'),
-          api.get<any>('/aggregation/me').catch(() => null),
-        ]);
-        setManagerData(res);
-        setAggregationData(agg);
-      } else if (user.role === 'REVIEWER') {
-        const [res, orgAgg] = await Promise.all([
-          api.get<any>('/dashboard/reviewer'),
-          api.get<any>('/aggregation/overview').catch(() => null),
-        ]);
-        setReviewerData(res);
-        setOrgAggregationData(orgAgg);
-      } else if (user.role === 'ADMIN') {
-        const res = await api.get<any>('/dashboard/admin');
-        setAdminData(res);
-      }
-    } catch (err: any) {
-      console.error('Failed to load dashboard data:', err);
-      setError('Failed to load dashboard metrics. Please check network connection.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: managerData, isLoading: managerLoading, error: managerErr } = useManagerDashboard(isManager);
+  const { data: aggregationData } = useAggregationMe(isManager);
+
+  const { data: reviewerData, isLoading: reviewerLoading, error: reviewerErr } = useReviewerDashboard(isReviewer);
+  const { data: orgAggregationData } = useAggregationOverview(isReviewer);
+
+  const { data: adminData, isLoading: adminLoading, error: adminErr } = useAdminDashboard(isAdmin);
+
+  const loading = isManager ? managerLoading : isReviewer ? reviewerLoading : isAdmin ? adminLoading : false;
+  const error = (managerErr || reviewerErr || adminErr)
+    ? 'Failed to load dashboard metrics. Please check network connection.'
+    : null;
 
   const getRatingBadgeVariant = (rating?: string): 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' => {
     switch (rating) {
       case 'Excellent':
+
         return 'success';
       case 'Good':
         return 'info';

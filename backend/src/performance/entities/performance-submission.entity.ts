@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { PeriodType, SubmissionStatus } from '../../common/constants/enums';
@@ -14,10 +15,13 @@ import { PerformanceEntry } from './performance-entry.entity';
 import { BSCPerspectiveScore } from './bsc-perspective-score.entity';
 
 @Entity('performance_submissions')
+@Index(['executive_id', 'status'])
+@Index(['executive_id', 'period_label'])
 export class PerformanceSubmission {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ type: 'uuid' })
   executive_id: string;
 
@@ -25,6 +29,7 @@ export class PerformanceSubmission {
   @JoinColumn({ name: 'executive_id' })
   executive: User;
 
+  @Index()
   @Column({ type: 'uuid' })
   submitted_by: string;
 
@@ -45,9 +50,11 @@ export class PerformanceSubmission {
   @Column({ type: 'date', nullable: true })
   period_end?: Date;
 
+  @Index()
   @Column()
   period_label: string; // e.g. "Monthly — 2026-08"
 
+  @Index()
   @Column({
     type: 'enum',
     enum: SubmissionStatus,
@@ -70,6 +77,7 @@ export class PerformanceSubmission {
   @OneToMany(() => BSCPerspectiveScore, (bsc) => bsc.submission)
   perspective_scores: BSCPerspectiveScore[];
 
+  @Index()
   @CreateDateColumn()
   created_at: Date;
 

@@ -4,15 +4,18 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { BscPerspective } from '../../common/constants/enums';
 import { PerformanceSubmission } from './performance-submission.entity';
 
 @Entity('bsc_perspective_scores')
+@Index(['submission_id', 'perspective'])
 export class BSCPerspectiveScore {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ type: 'uuid' })
   submission_id: string;
 

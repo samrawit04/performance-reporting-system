@@ -21,6 +21,8 @@ import { CreateAiAnalysesTable1724837000000 } from './migrations/1724837000000-C
 import { CreateReviewFeedbacksTable1724837100000 } from './migrations/1724837100000-CreateReviewFeedbacksTable';
 import { CreateAuditLogsTable1724837200000 } from './migrations/1724837200000-CreateAuditLogsTable';
 import { AddEntryDeliverableAndWeight1724837300000 } from './migrations/1724837300000-AddEntryDeliverableAndWeight';
+import { AddPerformanceIndexes1724837400000 } from './migrations/1724837400000-AddPerformanceIndexes';
+import { AddMissingPerformanceAndOptimizationIndexes1724837500000 } from './migrations/1724837500000-AddMissingPerformanceAndOptimizationIndexes';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { AddEntryDeliverableAndWeight1724837300000 } from './migrations/17248373
           CreateReviewFeedbacksTable1724837100000,
           CreateAuditLogsTable1724837200000,
           AddEntryDeliverableAndWeight1724837300000,
+          AddPerformanceIndexes1724837400000,
+          AddMissingPerformanceAndOptimizationIndexes1724837500000,
         ],
         ssl: {
           rejectUnauthorized: false, // Required for Neon PostgreSQL

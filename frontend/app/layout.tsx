@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../context/auth-context";
 import { ThemeProvider } from "../context/theme-context";
+import { QueryProvider } from "../components/providers/query-provider";
 
 export const metadata: Metadata = {
   title: "Performance Reporting System",
@@ -22,9 +23,12 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased dark">
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
+

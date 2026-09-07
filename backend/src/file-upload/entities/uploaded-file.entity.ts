@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { FileProcessingStatus } from '../../common/constants/enums';
@@ -14,6 +15,7 @@ export class UploadedFile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ type: 'uuid' })
   uploaded_by: string;
 
@@ -33,6 +35,7 @@ export class UploadedFile {
   @Column({ type: 'int' })
   file_size: number;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: FileProcessingStatus,

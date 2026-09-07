@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { BscPerspective } from '../../common/constants/enums';
 import { PerformanceSubmission } from './performance-submission.entity';
@@ -15,6 +16,7 @@ export class PerformanceEntry {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ type: 'uuid' })
   submission_id: string;
 
@@ -24,6 +26,7 @@ export class PerformanceEntry {
   @JoinColumn({ name: 'submission_id' })
   submission: PerformanceSubmission;
 
+  @Index()
   @Column({ type: 'uuid', nullable: true })
   kpi_definition_id?: string;
 
@@ -31,6 +34,7 @@ export class PerformanceEntry {
   @JoinColumn({ name: 'kpi_definition_id' })
   kpi_definition?: KpiDefinition;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: BscPerspective,

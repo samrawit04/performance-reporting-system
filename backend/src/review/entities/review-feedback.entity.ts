@@ -7,6 +7,7 @@ import {
   OneToOne,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { PerformanceSubmission } from '../../performance/entities/performance-submission.entity';
 import { User } from '../../users/entities/user.entity';
@@ -24,6 +25,7 @@ export class ReviewFeedback {
   @JoinColumn({ name: 'submission_id' })
   submission: PerformanceSubmission;
 
+  @Index()
   @Column({ type: 'uuid' })
   reviewer_id: string;
 
