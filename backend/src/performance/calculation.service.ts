@@ -21,10 +21,9 @@ interface CacheEntry<T> {
 }
 
 /**
- * TTL for the scoring config / rating thresholds cache in milliseconds.
- * Config is rarely changed by admins, so 5 minutes is safe.
+ * TTL for the scoring config / rating thresholds cache in milliseconds (5s).
  */
-const CONFIG_CACHE_TTL_MS = 5 * 60 * 1000;
+const CONFIG_CACHE_TTL_MS = 5 * 1000;
 
 @Injectable()
 export class CalculationService {
